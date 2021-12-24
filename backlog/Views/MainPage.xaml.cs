@@ -250,28 +250,29 @@ namespace backlog.Views
         /// <param name="e"></param>
         private async void SigninButton_Click(object sender, RoutedEventArgs e)
         {
-            ProgBar.Visibility = Visibility.Visible;
-            signedIn = ApplicationData.Current.LocalSettings.Values["SignedIn"]?.ToString();
-            if (isNetworkAvailable)
-            {
-                if (signedIn != "Yes")
-                {
-                    await SaveData.GetInstance().DeleteLocalFileAsync();
-                    graphServiceClient = await SaveData.GetInstance().GetGraphServiceClient();
-                    ApplicationData.Current.LocalSettings.Values["SignedIn"] = "Yes";
-                    Frame.Navigate(typeof(MainPage));
-                }
-            }
-            else
-            {
-                ContentDialog contentDialog = new ContentDialog
-                {
-                    Title = "No Internet",
-                    Content = "You need to be connected to sign-in",
-                    CloseButtonText = "Ok"
-                };
-                ContentDialogResult result = await contentDialog.ShowAsync();
-            }
+            //ProgBar.Visibility = Visibility.Visible;
+            //signedIn = ApplicationData.Current.LocalSettings.Values["SignedIn"]?.ToString();
+            //if (isNetworkAvailable)
+            //{
+            //    if (signedIn != "Yes")
+            //    {
+            //        await SaveData.GetInstance().DeleteLocalFileAsync();
+            //        graphServiceClient = await SaveData.GetInstance().GetGraphServiceClient();
+            //        ApplicationData.Current.LocalSettings.Values["SignedIn"] = "Yes";
+            //        Frame.Navigate(typeof(MainPage));
+            //    }
+            //}
+            //else
+            //{
+            //    ContentDialog contentDialog = new ContentDialog
+            //    {
+            //        Title = "No Internet",
+            //        Content = "You need to be connected to sign-in",
+            //        CloseButtonText = "Ok"
+            //    };
+            //    ContentDialogResult result = await contentDialog.ShowAsync();
+            //}
+            Frame.Navigate(typeof(SigninPage));
         }
 
         /// <summary>
