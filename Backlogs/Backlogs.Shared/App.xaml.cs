@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -15,53 +14,45 @@ using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
+using backlog.Views;
+using backlog.Utils;
+using System.Reflection;
+using Microsoft.Identity.Client;
+using Windows.Storage;
 
-namespace Backlogs
+namespace backlog
 {
     /// <summary>
     /// Provides application-specific behavior to supplement the default Application class.
     /// </summary>
-    public sealed partial class App : Application
+    sealed partial class App : Application
     {
-        private Window _window;
-
-        /// <summary>
         /// Initializes the singleton application object.  This is the first line of authored code
         /// executed, and as such is the logical equivalent of main() or WinMain().
         /// </summary>
         public App()
         {
-            InitializeLogging();
-
             this.InitializeComponent();
-
-#if HAS_UNO || NETFX_CORE
             this.Suspending += OnSuspending;
-#endif
+        }
+
+        public static TEnum GetEnum<TEnum>(string text) where TEnum : struct
+        {
+            if (!typeof(TEnum).GetTypeInfo().IsEnum)
+            {
+                throw new InvalidOperationException("Generic parameter 'TEnum' must be an enum.");
+            }
+            return (TEnum)Enum.Parse(typeof(TEnum), text);
         }
 
         /// <summary>
         /// Invoked when the application is launched normally by the end user.  Other entry points
         /// will be used such as when the application is launched to open a specific file.
         /// </summary>
-        /// <param name="args">Details about the launch request and process.</param>
-        protected override void OnLaunched(LaunchActivatedEventArgs args)
+        /// <param name="e">Details about the launch request and process.</param>
+        protected override void OnLaunched(LaunchActivatedEventArgs e)
         {
-#if DEBUG
-            if (System.Diagnostics.Debugger.IsAttached)
-            {
-                // this.DebugSettings.EnableFrameRateCounter = true;
-            }
-#endif
-
-#if NET5_0 && WINDOWS
-            _window = new Window();
-            _window.Activate();
-#else
-            _window = Windows.UI.Xaml.Window.Current;
-#endif
-
-            var rootFrame = _window.Content as Frame;
+            Frame rootFrame = Window.Current.Content as Frame;
 
             // Do not repeat app initialization when the Window already has content,
             // just ensure that the window is active
@@ -72,28 +63,26 @@ namespace Backlogs
 
                 rootFrame.NavigationFailed += OnNavigationFailed;
 
-                if (args.PreviousExecutionState == ApplicationExecutionState.Terminated)
+                if (e.PreviousExecutionState == ApplicationExecutionState.Terminated)
                 {
-                    // TODO: Load state from previously suspended application
+                    //TODO: Load state from previously suspended application
                 }
 
                 // Place the frame in the current Window
-                _window.Content = rootFrame;
+                Window.Current.Content = rootFrame;
             }
 
-#if !(NET5_0 && WINDOWS)
-            if (args.PrelaunchActivated == false)
-#endif
+            if (e.PrelaunchActivated == false)
             {
                 if (rootFrame.Content == null)
                 {
                     // When the navigation stack isn't restored navigate to the first page,
                     // configuring the new page by passing required information as a navigation
                     // parameter
-                    rootFrame.Navigate(typeof(MainPage), args.Arguments);
+                    rootFrame.Navigate(typeof(MainPage), "sync");
                 }
                 // Ensure the current window is active
-                _window.Activate();
+                Window.Current.Activate();
             }
         }
 
@@ -104,7 +93,7 @@ namespace Backlogs
         /// <param name="e">Details about the navigation failure</param>
         void OnNavigationFailed(object sender, NavigationFailedEventArgs e)
         {
-            throw new InvalidOperationException($"Failed to load {e.SourcePageType.FullName}: {e.Exception}");
+            throw new Exception("Failed to load Page " + e.SourcePageType.FullName);
         }
 
         /// <summary>
@@ -117,68 +106,106 @@ namespace Backlogs
         private void OnSuspending(object sender, SuspendingEventArgs e)
         {
             var deferral = e.SuspendingOperation.GetDeferral();
-            // TODO: Save application state and stop any background activity
+            //TODO: Save application state and stop any background activity
+            deferral.Complete();
+        }
+
+        protected override void OnActivated(IActivatedEventArgs args)
+        {
+            InitFrame(args);
+
+            base.OnActivated(args);
+        }
+
+        // Event fired when a Background Task is activated (in Single Process Model)
+        protected override void OnBackgroundActivated(BackgroundActivatedEventArgs args)
+        {
+            base.OnBackgroundActivated(args);
+
+            var deferral = args.TaskInstance.GetDeferral();
+
+            switch (args.TaskInstance.Task.Name)
+            {
+                case "ToastTask":
+                    new ToastBackgroundTask().Run(args.TaskInstance);
+                    break;
+            }
+
             deferral.Complete();
         }
 
         /// <summary>
-        /// Configures global Uno Platform logging
+        /// Initialized root frame and navigates to the main page
         /// </summary>
-        private static void InitializeLogging()
+        /// <param name="args"></param>
+        private void InitFrame(IActivatedEventArgs args)
         {
-            var factory = LoggerFactory.Create(builder =>
+            Frame rootFrame = GetRootFrame();
+            ThemeHelper.Initialize();
+
+            rootFrame.Navigate(typeof(MainPage), "sync");
+        }
+
+        /// <summary>
+        /// Gets the root frame. Used for setting the app theme at launch
+        /// </summary>
+        /// <returns>The root frame</returns>
+        private Frame GetRootFrame()
+        {
+            Frame rootFrame;
+            if (!(Window.Current.Content is MainPage rootPage))
             {
-#if __WASM__
-                builder.AddProvider(new global::Uno.Extensions.Logging.WebAssembly.WebAssemblyConsoleLoggerProvider());
-#elif __IOS__
-                builder.AddProvider(new global::Uno.Extensions.Logging.OSLogLoggerProvider());
-#elif NETFX_CORE
-                builder.AddDebug();
-#else
-                builder.AddConsole();
-#endif
+                rootPage = new MainPage();
+                rootFrame = (Frame)rootPage.FindName("rootFrame");
+                if (rootFrame == null)
+                {
+                    throw new Exception("Root frame not found");
+                }
+                rootFrame.Language = Windows.Globalization.ApplicationLanguages.Languages[0];
+                rootFrame.NavigationFailed += OnNavigationFailed;
 
-                // Exclude logs below this level
-                builder.SetMinimumLevel(LogLevel.Information);
+                Window.Current.Content = rootPage;
+            }
+            else
+            {
+                rootFrame = (Frame)rootPage.FindName("rootFrame");
+            }
 
-                // Default filters for Uno Platform namespaces
-                builder.AddFilter("Uno", LogLevel.Warning);
-                builder.AddFilter("Windows", LogLevel.Warning);
-                builder.AddFilter("Microsoft", LogLevel.Warning);
+            return rootFrame;
+        }
 
-                // Generic Xaml events
-                // builder.AddFilter("Windows.UI.Xaml", LogLevel.Debug );
-                // builder.AddFilter("Windows.UI.Xaml.VisualStateGroup", LogLevel.Debug );
-                // builder.AddFilter("Windows.UI.Xaml.StateTriggerBase", LogLevel.Debug );
-                // builder.AddFilter("Windows.UI.Xaml.UIElement", LogLevel.Debug );
-                // builder.AddFilter("Windows.UI.Xaml.FrameworkElement", LogLevel.Trace );
+        protected async override void OnFileActivated(FileActivatedEventArgs args)
+        {
+            // TODO: Handle file activation
+            // The number of files received is args.Files.Count
+            // The name of the first file is args.Files[0].Name
+            if (args.Files.Count > 0)
+            {
+                StorageFile storageFile = args.Files[0] as StorageFile;
+                StorageFolder storageFolder = ApplicationData.Current.TemporaryFolder;
+                await storageFolder.CreateFileAsync(storageFile.Name, CreationCollisionOption.ReplaceExisting);
+                string json = await FileIO.ReadTextAsync(storageFile);
+                var file = await storageFolder.GetFileAsync(storageFile.Name);
+                await FileIO.WriteTextAsync(file, json);
+                Frame rootFrame = Window.Current.Content as Frame;
 
-                // Layouter specific messages
-                // builder.AddFilter("Windows.UI.Xaml.Controls", LogLevel.Debug );
-                // builder.AddFilter("Windows.UI.Xaml.Controls.Layouter", LogLevel.Debug );
-                // builder.AddFilter("Windows.UI.Xaml.Controls.Panel", LogLevel.Debug );
+                // Do not repeat app initialization when the Window already has content,
+                // just ensure that the window is active
+                if (rootFrame == null)
+                {
+                    // Create a Frame to act as the navigation context and navigate to the first page
+                    rootFrame = new Frame();
 
-                // builder.AddFilter("Windows.Storage", LogLevel.Debug );
+                    rootFrame.NavigationFailed += OnNavigationFailed;
+                    // Place the frame in the current Window
+                    Window.Current.Content = rootFrame;
+                }
 
-                // Binding related messages
-                // builder.AddFilter("Windows.UI.Xaml.Data", LogLevel.Debug );
-                // builder.AddFilter("Windows.UI.Xaml.Data", LogLevel.Debug );
 
-                // Binder memory references tracking
-                // builder.AddFilter("Uno.UI.DataBinding.BinderReferenceHolder", LogLevel.Debug );
-
-                // RemoteControl and HotReload related
-                // builder.AddFilter("Uno.UI.RemoteControl", LogLevel.Information);
-
-                // Debug JS interop
-                // builder.AddFilter("Uno.Foundation.WebAssemblyRuntime", LogLevel.Debug );
-            });
-
-            global::Uno.Extensions.LogExtensionPoint.AmbientLoggerFactory = factory;
-
-#if HAS_UNO
-			global::Uno.UI.Adapter.Microsoft.Extensions.Logging.LoggingAdapter.Initialize();
-#endif
+                rootFrame.Navigate(typeof(ImportBacklog), file.Name);
+                // Ensure the current window is active
+                Window.Current.Activate();
+            }
         }
     }
 }

@@ -1,0 +1,105 @@
+﻿<Page
+    x:Class="backlog.Views.CreatePage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:backlog.Views"
+    xmlns:data="using:backlog.Models"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+    <Grid>
+        <VisualStateManager.VisualStateGroups>
+            <VisualStateGroup x:Name="LayoutVisualStates">
+                <VisualState x:Name="WideLayout">
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="{StaticResource Breakpoint640Plus}" />
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters />
+                </VisualState>
+                <VisualState x:Name="NarrowLayout">
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="0" />
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter Target="BottomBar.Visibility" Value="Visible" />
+                        <Setter Target="TopBar.Visibility" Value="Collapsed" />
+                    </VisualState.Setters>
+                </VisualState>
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>
+
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <StackPanel>
+                <TextBlock Text="Create a new Backlog" FontSize="30" Margin="10,0,0,20" />
+                <TextBlock Text="The app will search various sources such as IMDB and Twitch for metadata, and will fail to create a Backlog if not found. Except for music backlogs, search results will be shown."
+                       Margin="10,0,0,20" TextWrapping="Wrap" />
+                <TextBlock Text="Please follow the hints given in the textbox when entering the name. Do NOT use special characters."
+                       Foreground="Yellow" FontStyle="Italic" Margin="10,0,0,20" TextWrapping="Wrap" />
+                <ComboBox x:Name="TypeComoBox" Header="Type" SelectionChanged="TypeComoBox_SelectionChanged" PlaceholderText="Choose type" Margin="10,0,0,20">
+                    <x:String>Film</x:String>
+                    <x:String>TV</x:String>
+                    <x:String>Album</x:String>
+                    <x:String>Game</x:String>
+                    <x:String>Book</x:String>
+                </ComboBox>
+                <TextBlock Text="Name" Margin="10,0,0,20" />
+                <TextBox x:Name="NameInput" PlaceholderText="Enter the name" Margin="10,0,0,20" />
+                <TextBlock Text="When do you want to check this out? (optional)" Margin="10,0,0,20" />
+                <CalendarView x:Name="DatePicker" Margin="10,0,0,20" />
+                <TimePicker x:Name="TimePicker" Header="When do you want to be notified? (optional)" Margin="10,0,0,20" Time="0" />
+            </StackPanel>
+        </ScrollViewer>
+
+        <muxc:ProgressBar x:Name="ProgBar" IsIndeterminate="True" Visibility="Collapsed" />
+
+        <ContentDialog x:Name="ResultsDialog" CloseButtonText="Cancel">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                
+                <TextBlock x:Name="SearchResultsHeader" TextWrapping="Wrap" Margin="0,10,0,30" />
+                <ListView x:Name="ResultsListView" SelectionChanged="ResultsListView_SelectionChanged" ScrollViewer.VerticalScrollBarVisibility="Auto" Grid.Row="1">
+                    <ListView.ItemTemplate>
+                        <DataTemplate x:DataType="data:SearchResult">
+                            <Grid Margin="20">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+
+                                <Image Source="{x:Bind ImageURL}" MaxHeight="100" MaxWidth="100" Stretch="Uniform"/>
+                                <StackPanel Grid.Column="1">
+                                    <TextBlock Text="{x:Bind Name}" Margin="10" TextWrapping="Wrap"/>
+                                    <TextBlock Text="{x:Bind Description}"  Margin="10"/>
+                                </StackPanel>
+                            </Grid>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+            </Grid>
+        </ContentDialog>
+    </Grid>
+    <Page.TopAppBar>
+        <CommandBar x:Name="TopBar" Background="Transparent" DefaultLabelPosition="Right" >
+            <AppBarButton x:Name="TopCreateButton" Icon="Accept" Label="Create" Click="CreateButton_Click" />
+            <AppBarButton x:Name="TopCancelButton" Icon="Cancel" Label="Cancel" Click="CancelButton_Click" />
+            <CommandBar.SecondaryCommands>
+                <AppBarButton x:Name="TopSettingsButton" Icon="Setting" Label="Settings + more" Click="SettingsButton_Click" />
+            </CommandBar.SecondaryCommands>
+        </CommandBar>
+    </Page.TopAppBar>
+    <Page.BottomAppBar>
+        <CommandBar x:Name="BottomBar" Visibility="Collapsed" >
+            <AppBarButton x:Name="BottomCreateButton" Icon="Accept" Label="Create" Click="CreateButton_Click" />
+            <AppBarButton x:Name="BottomCancelButton" Icon="Cancel" Label="Cancel" Click="CancelButton_Click" />
+            <CommandBar.SecondaryCommands>
+                <AppBarButton x:Name="BottomSettingsButton" Icon="Setting" Label="Settings + more" Click="SettingsButton_Click" />
+            </CommandBar.SecondaryCommands>
+        </CommandBar>
+    </Page.BottomAppBar>
+</Page>
