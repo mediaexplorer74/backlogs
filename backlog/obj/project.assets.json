@@ -33563,11 +33563,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\surya\\git\\backlogs\\backlog\\backlog.csproj",
+      "projectUniqueName": "C:\\Users\\surya\\git\\backlogs-uno\\backlog\\backlog.csproj",
       "projectName": "backlog",
-      "projectPath": "C:\\Users\\surya\\git\\backlogs\\backlog\\backlog.csproj",
+      "projectPath": "C:\\Users\\surya\\git\\backlogs-uno\\backlog\\backlog.csproj",
       "packagesPath": "C:\\Users\\surya\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\surya\\git\\backlogs\\backlog\\obj\\",
+      "outputPath": "C:\\Users\\surya\\git\\backlogs-uno\\backlog\\obj\\",
       "projectStyle": "PackageReference",
       "skipContentFileWrite": true,
       "fallbackFolders": [
