@@ -166,7 +166,7 @@ namespace Backlogs.Views
             }
             catch (Exception ex)
             {
-                Debug.WriteLine(ex.StackTrace);
+                //Debug.WriteLine(ex.StackTrace);
                 await Logger.Error("Failed to create backlog", ex);
             }
         }

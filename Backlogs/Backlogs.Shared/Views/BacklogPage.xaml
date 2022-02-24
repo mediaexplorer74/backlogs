@@ -2,6 +2,7 @@
     x:Class="Backlogs.Views.BacklogPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:win="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:utils="using:Backlogs.Utils"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -53,11 +54,11 @@
                     <Grid.Background>
                         <ImageBrush ImageSource="{x:Bind backlog.ImageURL}" Stretch="UniformToFill" />
                     </Grid.Background>
-                    <Border VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
-                        <Border.Background>
+                    <win:Border VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+                        <win:Border.Background>
                             <media:BackdropBlurBrush Amount="15" />
-                        </Border.Background>
-                    </Border>
+                        </win:Border.Background>
+                    </win:Border>
                     
                     <RelativePanel>
                         <Image x:Name="img" Source="{x:Bind backlog.ImageURL}" Height="200" Width="200" HorizontalAlignment="Center" Margin="30"/>

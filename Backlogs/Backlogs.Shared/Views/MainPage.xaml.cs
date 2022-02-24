@@ -81,22 +81,22 @@ namespace Backlogs.Views
         /// </summary>
         private void ShowTeachingTips()
         {
-            if(Settings.IsFirstRun)
-            {
-                NavigationTeachingTip.IsOpen = true;
-                Settings.IsFirstRun = false;
-            }
-            if(!Settings.IsSignedIn)
-            {
-                if(TopAppBar.Visibility == Visibility.Visible)
-                {
-                    TopSigninTeachingTip.IsOpen=true;
-                }
-                else
-                {
-                    BottomSigninTeachingTip.IsOpen = true;
-                }
-            }
+            //if(Settings.IsFirstRun)
+            //{
+            //    NavigationTeachingTip.IsOpen = true;
+            //    Settings.IsFirstRun = false;
+            //}
+            //if(!Settings.IsSignedIn)
+            //{
+            //    if(TopAppBar.Visibility == Visibility.Visible)
+            //    {
+            //        TopSigninTeachingTip.IsOpen=true;
+            //    }
+            //    else
+            //    {
+            //        BottomSigninTeachingTip.IsOpen = true;
+            //    }
+            //}
         }
 
         protected async override void OnNavigatedTo(NavigationEventArgs e)
@@ -237,8 +237,8 @@ namespace Backlogs.Views
         private async void SigninButton_Click(object sender, RoutedEventArgs e)
         {
             ProgBar.Visibility = Visibility.Visible;
-            TopSigninTeachingTip.IsOpen = false;
-            BottomSigninTeachingTip.IsOpen = false;
+            //TopSigninTeachingTip.IsOpen = false;
+            //BottomSigninTeachingTip.IsOpen = false;
             signedIn = Settings.IsSignedIn;
             if (isNetworkAvailable)
             {
