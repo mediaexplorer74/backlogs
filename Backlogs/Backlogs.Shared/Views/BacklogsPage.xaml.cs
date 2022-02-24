@@ -112,6 +112,7 @@ namespace Backlogs.Views
 
         private void View_BackRequested(object sender, BackRequestedEventArgs e)
         {
+#if NETFX_CORE
             try
             {
                 Frame.Navigate(typeof(MainPage), null, new SlideNavigationTransitionInfo() { Effect = SlideNavigationTransitionEffect.FromLeft });
@@ -120,6 +121,9 @@ namespace Backlogs.Views
             {
                 Frame.Navigate(typeof(MainPage));
             }
+#else
+            Frame.Navigate(typeof(MainPage));
+#endif
             e.Handled = true;
         }
 
@@ -260,6 +264,7 @@ namespace Backlogs.Views
         /// <param name="e"></param>
         private void CreateButton_Click(object sender, RoutedEventArgs e)
         {
+#if NETFX_CORE
             try
             {
                 Frame.Navigate(typeof(CreatePage), null, new SlideNavigationTransitionInfo() { Effect = SlideNavigationTransitionEffect.FromBottom });
@@ -268,6 +273,9 @@ namespace Backlogs.Views
             {
                 Frame.Navigate(typeof(CreatePage));
             }
+#else
+            Frame.Navigate(typeof(CreatePage));
+#endif
         }
 
         /// <summary>
@@ -292,6 +300,7 @@ namespace Backlogs.Views
 
         private void CompletedBacklogsButton_Click(object sender, RoutedEventArgs e)
         {
+#if NETFX_CORE
             try
             {
                 Frame.Navigate(typeof(CompletedBacklogsPage), null, new SlideNavigationTransitionInfo() { Effect = SlideNavigationTransitionEffect.FromRight });
@@ -300,6 +309,9 @@ namespace Backlogs.Views
             {
                 Frame.Navigate(typeof(CompletedBacklogsPage));
             }
+#else
+            Frame.Navigate(typeof(CompletedBacklogsPage));
+#endif
         }
         /// <summary>
         /// Finish connected animation
@@ -308,6 +320,7 @@ namespace Backlogs.Views
         /// <param name="e"></param>
         private async void BacklogsGrid_Loaded(object sender, RoutedEventArgs e)
         {
+#if NETFX_CORE
             if (backlogIndex != -1)
             {
                 ConnectedAnimation animation = ConnectedAnimationService.GetForCurrentView().GetAnimation("backAnimation");
@@ -320,6 +333,7 @@ namespace Backlogs.Views
                     // : )
                 }
             }
+#endif
         }
 
         private async void SearchButton_Click(object sender, RoutedEventArgs e)

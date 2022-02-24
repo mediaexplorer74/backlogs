@@ -215,6 +215,7 @@ namespace Backlogs.Views
                 backlogs.Add(backlog);
                 SaveData.GetInstance().SaveSettings(backlogs);
                 await SaveData.GetInstance().WriteDataAsync(signedIn);
+#if NETFX_CORE
                 try
                 {
                     Frame.Navigate(typeof(MainPage), null, new SlideNavigationTransitionInfo() { Effect = SlideNavigationTransitionEffect.FromBottom });
@@ -223,6 +224,9 @@ namespace Backlogs.Views
                 {
                     Frame.Navigate(typeof(MainPage));
                 }
+#else
+                Frame.Navigate(typeof(MainPage));
+#endif
             }
             else
             {
@@ -658,6 +662,7 @@ namespace Backlogs.Views
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
             PageStackEntry prevPage = Frame.BackStack.Last();
+#if NETFX_CORE
             try
             {
                 Frame.Navigate(prevPage?.SourcePageType, null, new SlideNavigationTransitionInfo() { Effect = SlideNavigationTransitionEffect.FromBottom});
@@ -666,6 +671,9 @@ namespace Backlogs.Views
             {
                 Frame.Navigate(prevPage?.SourcePageType);
             }
+#else
+            Frame.Navigate(prevPage?.SourcePageType);
+#endif
         }
 
         private void SettingsButton_Click(object sender, RoutedEventArgs e)

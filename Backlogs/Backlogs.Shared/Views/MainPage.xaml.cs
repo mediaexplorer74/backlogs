@@ -11,7 +11,9 @@ using System.Threading.Tasks;
 using Windows.UI.Core;
 using System.Net.NetworkInformation;
 using Microsoft.Graph;
+#if NETFX_CORE
 using Microsoft.Toolkit.Uwp.Notifications;
+#endif
 using Windows.UI.Notifications;
 using System.Globalization;
 using Windows.ApplicationModel.DataTransfer;
@@ -60,7 +62,9 @@ namespace Backlogs.Views
         {
             this.InitializeComponent();
             isNetworkAvailable = NetworkInterface.GetIsNetworkAvailable();
+#if NETFX_CORE
             TileUpdateManager.CreateTileUpdaterForApplication().EnableNotificationQueue(true);
+#endif
             WelcomeText.Text = Settings.IsSignedIn ? $"Welcome to Backlogs, {Settings.UserName}!" : "Welcome to Backlogs, stranger!";
             Task.Run(async () => { await SaveData.GetInstance().ReadDataAsync(); }).Wait();
             recentlyAdded = new ObservableCollection<Backlog>();
@@ -123,7 +127,9 @@ namespace Backlogs.Views
                 BottomProfileButton.Visibility = Visibility.Visible;
                 await SaveData.GetInstance().ReadDataAsync(sync);
                 LoadBacklogs();
+#if NETFX_CORE
                 BuildNotifactionQueue();
+#endif
             }
             ShowTeachingTips();
             ProgBar.Visibility = Visibility.Collapsed;
@@ -263,6 +269,7 @@ namespace Backlogs.Views
         /// <param name="e"></param>
         private void CreateButton_Click(object sender, RoutedEventArgs e)
         {
+#if NETFX_CORE
             try
             {
                 Frame.Navigate(typeof(CreatePage), null, new SlideNavigationTransitionInfo() { Effect = SlideNavigationTransitionEffect.FromBottom});
@@ -271,6 +278,9 @@ namespace Backlogs.Views
             {
                 Frame.Navigate(typeof(CreatePage));
             }
+#else
+            Frame.Navigate(typeof(MainPage));
+#endif
         }
 
         /// <summary>
@@ -299,6 +309,7 @@ namespace Backlogs.Views
         /// </summary>
         private void BuildNotifactionQueue()
         {
+#if NETFX_CORE
             if(backlogs != null)
             {
                 foreach (var b in new ObservableCollection<Backlog>(backlogs.OrderByDescending(b => b.TargetDate)))
@@ -327,10 +338,12 @@ namespace Backlogs.Views
                         GenerateLiveTiles(b);
                 }
             }
+#endif
         }
 
         private void GenerateLiveTiles(Backlog b)
         {
+#if NETFX_CORE
             var tileContent = new TileContent()
             {
                 Visual = new TileVisual()
@@ -406,6 +419,7 @@ namespace Backlogs.Views
 
             // And send the notification to the primary tile
             TileUpdateManager.CreateTileUpdaterForApplication().Update(tileNotif);
+#endif
         }
 
         private void ShareButton_Click(object sender, RoutedEventArgs e)
@@ -442,6 +456,7 @@ namespace Backlogs.Views
 
         private void CompletedBacklogsButton_Click(object sender, RoutedEventArgs e)
         {
+#if NETFX_CORE
             try
             {
                 Frame.Navigate(typeof(CompletedBacklogsPage), null, new SlideNavigationTransitionInfo() { Effect = SlideNavigationTransitionEffect.FromRight});
@@ -450,6 +465,9 @@ namespace Backlogs.Views
             {
                 Frame.Navigate(typeof(CompletedBacklogsPage));
             }
+#else
+            Frame.Navigate(typeof(CompletedBacklogsPage));
+#endif
         }
 
         private void BacklogsButton_Click(object sender, RoutedEventArgs e)
@@ -466,6 +484,7 @@ namespace Backlogs.Views
 
         private async void AddedBacklogsGrid_Loaded(object sender, RoutedEventArgs e)
         {
+#if NETFX_CORE
             if (backlogIndex != -1)
             {
                 ConnectedAnimation animation = ConnectedAnimationService.GetForCurrentView().GetAnimation("backAnimation");
@@ -478,6 +497,7 @@ namespace Backlogs.Views
                     // : )
                 }
             }
+#endif
         }
 
         private void AllAddedButton_Click(object sender, RoutedEventArgs e)

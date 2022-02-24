@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+#if NETFX_CORE
 using Microsoft.Toolkit.Uwp.Notifications;
+#endif
 using Windows.ApplicationModel.Background;
 using Windows.UI.Notifications;
 using Backlogs.Saving;
@@ -17,6 +19,7 @@ namespace Backlogs.Utils
     {
         public void Run(IBackgroundTaskInstance taskInstance)
         {
+#if NETFX_CORE
             ObservableCollection<Backlog> backlogs = SaveData.GetInstance().GetBacklogs();
             foreach(Backlog b in backlogs)
             {
@@ -29,6 +32,7 @@ namespace Backlogs.Utils
                     builder.Show();
                 }
             }
+#endif
         }
     }
 }

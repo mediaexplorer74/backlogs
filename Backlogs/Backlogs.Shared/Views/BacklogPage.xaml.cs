@@ -85,8 +85,10 @@ namespace Backlogs.Views
             SourceLinkButton.NavigateUri = sourceLink;
             base.OnNavigatedTo(e);
             prevPage = Frame.BackStack.Last();
+#if NETFX_CORE
             ConnectedAnimation imageAnimation = ConnectedAnimationService.GetForCurrentView().GetAnimation("cover");
             imageAnimation?.TryStart(img);
+#endif
         }
 
         private async void Hyperlink_Click(Windows.UI.Xaml.Documents.Hyperlink sender, Windows.UI.Xaml.Documents.HyperlinkClickEventArgs args)
@@ -138,6 +140,7 @@ namespace Backlogs.Views
 
         private async void DoneButton_Click(object sender, RoutedEventArgs e)
         {
+#if NETFX_CORE
             try
             {
                 ConnectedAnimation animation = ConnectedAnimationService.GetForCurrentView().PrepareToAnimate("backAnimation", img);
@@ -152,6 +155,9 @@ namespace Backlogs.Views
             {
                 Frame.Navigate(prevPage?.SourcePageType, backlogIndex, new SuppressNavigationTransitionInfo());
             }
+#else
+            Frame.Navigate(prevPage?.SourcePageType);
+#endif
             if (edited)
                 await SaveBacklog();
         }

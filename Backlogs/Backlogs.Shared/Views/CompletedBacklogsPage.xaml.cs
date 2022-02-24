@@ -56,6 +56,7 @@ namespace Backlogs.Views
         private void View_BackRequested(object sender, BackRequestedEventArgs e)
         {
             PageStackEntry prevPage = Frame.BackStack.Last();
+#if NETFX_CORE
             try
             {
                 Frame.Navigate(prevPage?.SourcePageType, null, new SlideNavigationTransitionInfo() { Effect = SlideNavigationTransitionEffect.FromLeft });
@@ -64,6 +65,9 @@ namespace Backlogs.Views
             {
                 Frame.Navigate(prevPage?.SourcePageType);
             }
+#else
+            Frame.Navigate(prevPage?.SourcePageType);
+#endif
             e.Handled = true;
         }
 
@@ -109,6 +113,7 @@ namespace Backlogs.Views
 
         private async void CloseButton_Click(object sender, RoutedEventArgs e)
         {
+#if NETFX_CORE
             try
             {
                 ConnectedAnimation connectedAnimation = ConnectedAnimationService.GetForCurrentView().PrepareToAnimate("backwardsAnimation", destinationGrid);
@@ -120,12 +125,16 @@ namespace Backlogs.Views
             {
                 PopupOverlay.Hide();
             }
+#else
+            PopupOverlay.Hide();
+#endif
         }
 
         private async void MainGrid_ItemClick(object sender, ItemClickEventArgs e)
         {
             var selectedBacklog = e.ClickedItem as Backlog;
             SelectedBacklog = selectedBacklog;
+#if NETFX_CORE
             try
             {
                 ConnectedAnimation connectedAnimation = MainGrid.PrepareConnectedAnimation("forwardAnimation", SelectedBacklog, "connectedElement");
@@ -138,6 +147,7 @@ namespace Backlogs.Views
                 // ; )
             }
 
+#endif
             PopupImage.Source = new BitmapImage(new Uri(selectedBacklog.ImageURL));
             PopupTitle.Text = selectedBacklog.Name;
             PopupDirector.Text = selectedBacklog.Director;
