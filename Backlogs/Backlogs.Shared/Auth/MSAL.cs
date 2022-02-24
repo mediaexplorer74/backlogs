@@ -5,26 +5,26 @@ using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
-using backlog.Logging;
-using Logger = backlog.Logging.Logger;
+using Backlogs.Logging;
+using Logger = Backlogs.Logging.Logger;
 using Microsoft.Graph;
 using Windows.Security.Authentication.Web;
 using System.Net.Http.Headers;
 using Windows.Storage;
 using System.IO;
-using backlog.Utils;
+using Backlogs.Utils;
 using Windows.UI.Xaml.Media.Imaging;
 using Windows.Graphics.Imaging;
 using System.Threading;
 using Windows.UI.Core;
 using System.Diagnostics;
-using backlog.Saving;
+using Backlogs.Saving;
 
-namespace backlog.Auth
+namespace Backlogs.Auth
 {
     public class MSAL
     {
-        private const string ClientId = "c81b068d-ab10-4c00-a24d-08c3a1a6b7c6";
+        private const string ClientId = "7ff23ca6-8307-4cd1-8930-ce4ebd0418b7";
         private static readonly string MSGraphURL = "https://graph.microsoft.com/v1.0/";
         private static GraphServiceClient graphServiceClient = null;
         private static IPublicClientApplication PublicClientApplication;
@@ -46,7 +46,7 @@ namespace backlog.Auth
             string sid = WebAuthenticationBroker.GetCurrentApplicationCallbackUri().Host.ToUpper();
 
             // the redirect uri you need to register
-            string redirectUri = $"ms-appx-web://microsoft.aad.brokerplugin/S-1-15-2-2566872105-1906516075-403359635-2971900813-1913047554-2806970718-2761120688";
+            string redirectUri = $"ms-appx-web://microsoft.aad.brokerplugin/S-1-15-2-4253267031-4257092517-3713903359-2216172251-2905670859-2851875097-3927788056";
 
             AuthenticationResult authResult;
 

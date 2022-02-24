@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using Windows.UI;
 using Windows.UI.Xaml.Media;
 
-namespace backlog.Models
+namespace Backlogs.Models
 {
     public class Backlog : INotifyPropertyChanged
     {

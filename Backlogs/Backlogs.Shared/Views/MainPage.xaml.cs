@@ -3,9 +3,9 @@ using System.Linq;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Navigation;
-using backlog.Models;
-using backlog.Saving;
-using backlog.Utils;
+using Backlogs.Models;
+using Backlogs.Saving;
+using Backlogs.Utils;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using Windows.UI.Core;
@@ -18,15 +18,15 @@ using Windows.ApplicationModel.DataTransfer;
 using Windows.UI.Xaml.Media.Imaging;
 using Windows.Storage.Streams;
 using Windows.UI.Xaml.Media.Animation;
-using backlog.Logging;
+using Backlogs.Logging;
 using Windows.Storage;
-using backlog.Auth;
+using Backlogs.Auth;
 using System.Collections.Generic;
 using System.Diagnostics;
 
 // The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
 
-namespace backlog.Views
+namespace Backlogs.Views
 {
     /// <summary>
     /// An empty page that can be used on its own or navigated to within a Frame.
@@ -200,8 +200,8 @@ namespace backlog.Views
         {
             await Logger.Info("Setting user photo....");
             string userName = Settings.UserName;
-            TopProfileButton.Label = userName;
-            BottomProfileButton.Label = userName;
+            TopProfileButton.Label = userName ?? "S";
+            BottomProfileButton.Label = userName ?? "S";
             var cacheFolder = ApplicationData.Current.LocalCacheFolder;
             try
             {

@@ -1,6 +1,6 @@
-﻿using backlog.Models;
-using backlog.Saving;
-using backlog.Utils;
+﻿using Backlogs.Models;
+using Backlogs.Saving;
+using Backlogs.Utils;
 using Microsoft.Graph;
 using Newtonsoft.Json;
 using System;
@@ -12,13 +12,13 @@ using System.Threading.Tasks;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Navigation;
-using backlog.Logging;
+using Backlogs.Logging;
 using Windows.UI.Xaml.Media.Animation;
 using System.Linq;
 
 // The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=234238
 
-namespace backlog.Views
+namespace Backlogs.Views
 {
     /// <summary>
     /// An empty page that can be used on its own or navigated to within a Frame.

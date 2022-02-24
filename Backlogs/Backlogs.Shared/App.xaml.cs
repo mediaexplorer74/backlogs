@@ -14,13 +14,13 @@ using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
-using backlog.Views;
-using backlog.Utils;
+using Backlogs.Views;
+using Backlogs.Utils;
 using System.Reflection;
 using Microsoft.Identity.Client;
 using Windows.Storage;
 
-namespace backlog
+namespace Backlogs
 {
     /// <summary>
     /// Provides application-specific behavior to supplement the default Application class.

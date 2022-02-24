@@ -6,17 +6,17 @@ using System.IO;
 using System.Linq;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
-using backlog.Models;
+using Backlogs.Models;
 using Microsoft.Graph;
 using Microsoft.Identity.Client;
 using Newtonsoft.Json;
 using Windows.Graphics.Imaging;
 using Windows.Storage;
 using Windows.UI.Xaml.Media.Imaging;
-using backlog.Utils;
-using backlog.Auth;
+using Backlogs.Utils;
+using Backlogs.Auth;
 
-namespace backlog.Saving
+namespace Backlogs.Saving
 {
     class SaveData
     {

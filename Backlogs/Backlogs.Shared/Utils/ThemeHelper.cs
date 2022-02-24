@@ -8,7 +8,7 @@ using Windows.UI;
 using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
 
-namespace backlog.Utils
+namespace Backlogs.Utils
 {
     public static class ThemeHelper
     {
@@ -32,7 +32,7 @@ namespace backlog.Utils
                     }
                 }
 
-                return backlog.App.GetEnum<ElementTheme>(App.Current.RequestedTheme.ToString());
+                return Backlogs.App.GetEnum<ElementTheme>(App.Current.RequestedTheme.ToString());
             }
         }
 
@@ -69,7 +69,7 @@ namespace backlog.Utils
             string savedTheme = ApplicationData.Current.LocalSettings.Values[SelectedAppThemeKey]?.ToString();
             if (savedTheme != null)
             {
-                RootTheme = backlog.App.GetEnum<ElementTheme>(savedTheme);
+                RootTheme = Backlogs.App.GetEnum<ElementTheme>(savedTheme);
             }
 
             // Registering to color changes, thus we notice when user changes theme system wide

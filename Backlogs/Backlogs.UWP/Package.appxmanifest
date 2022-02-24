@@ -7,15 +7,15 @@
   IgnorableNamespaces="uap mp">
 
   <Identity
-    Name="16bce969-7029-4766-8a29-6b983186cff2"
-    Publisher="CN=surya"
-    Version="1.0.0.0" />
+    Name="37533SuryaKashyap.Backlogs"
+    Publisher="CN=7115D965-9BEF-4D32-9397-2F0F733B3D6D"
+    Version="0.9.2.0" />
 
-  <mp:PhoneIdentity PhoneProductId="521d71c8-510c-43e7-9ad2-ce69836fd819" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
+  <mp:PhoneIdentity PhoneProductId="af8238ee-b880-4e0d-9580-215f87474c52" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 
   <Properties>
     <DisplayName>Backlogs</DisplayName>
-    <PublisherDisplayName>Backlogs</PublisherDisplayName>
+    <PublisherDisplayName>Surya K</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
   </Properties>
 
@@ -30,16 +30,37 @@
   <Applications>
     <Application Id="App"
       Executable="$targetnametoken$.exe"
-      EntryPoint="Backlogs.App">
+      EntryPoint="Backlog.App">
       <uap:VisualElements
         DisplayName="Backlogs"
         Square150x150Logo="Assets\Square150x150Logo.png"
         Square44x44Logo="Assets\Square44x44Logo.png"
-        Description="Backlogs"
+        Description="backlog"
         BackgroundColor="transparent">
-        <uap:DefaultTile Wide310x150Logo="Assets\Wide310x150Logo.png"/>
-        <uap:SplashScreen Image="Assets\SplashScreen.png" />
+        <uap:DefaultTile Wide310x150Logo="Assets\Wide310x150Logo.png" Square71x71Logo="Assets\SmallTile.png" Square310x310Logo="Assets\LargeTile.png" ShortName="Backlogs">
+          <uap:ShowNameOnTiles>
+            <uap:ShowOn Tile="square150x150Logo"/>
+            <uap:ShowOn Tile="wide310x150Logo"/>
+            <uap:ShowOn Tile="square310x310Logo"/>
+          </uap:ShowNameOnTiles>
+        </uap:DefaultTile >
+        <uap:SplashScreen Image="Assets\SplashScreen.png"  BackgroundColor="transparent"/>
+        <uap:InitialRotationPreference>
+          <uap:Rotation Preference="landscape"/>
+          <uap:Rotation Preference="portrait"/></uap:InitialRotationPreference>
       </uap:VisualElements>
+      <Extensions>
+        <uap:Extension Category="windows.fileTypeAssociation">
+          <uap:FileTypeAssociation Name="bklg">
+            <uap:SupportedFileTypes>
+              <uap:FileType>.bklg</uap:FileType>
+            </uap:SupportedFileTypes>
+            <uap:DisplayName>bklg</uap:DisplayName>
+            <uap:InfoTip>A Backlog item</uap:InfoTip>
+            <uap:EditFlags OpenIsSafe="true"/>
+          </uap:FileTypeAssociation>
+        </uap:Extension>
+      </Extensions>
     </Application>
   </Applications>
 

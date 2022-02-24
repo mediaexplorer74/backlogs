@@ -4,19 +4,19 @@ using Windows.UI.Core;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Navigation;
-using backlog.Utils;
+using Backlogs.Utils;
 using Windows.ApplicationModel.Email;
 using System.Threading.Tasks;
 using Windows.Storage.Streams;
 using Windows.UI.Xaml.Media.Imaging;
-using backlog.Saving;
-using backlog.Logging;
+using Backlogs.Saving;
+using Backlogs.Logging;
 using System.Text;
-using backlog.Auth;
+using Backlogs.Auth;
 
 // The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=234238
 
-namespace backlog.Views
+namespace Backlogs.Views
 {
     /// <summary>
     /// An empty page that can be used on its own or navigated to within a Frame.
