@@ -1,6 +1,6 @@
 <img src="backlog/Assets/app-icon.png" width="100" height="100" />
 <h2>Backlogs</h2>
-This is the fork of https://github.com/surya-sk/backlogs
+This is the fork of https://github.com/surya-sk/backlogs (Backlogs 0.9.2, dev branch)
 
 I'm  trying to fix toast notifications, especially for Lumia phone / Win10Mobile
 
