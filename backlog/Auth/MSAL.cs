@@ -1,4 +1,6 @@
-﻿using Microsoft.Identity.Client;
+﻿// MSAL
+
+using Microsoft.Identity.Client;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,10 +26,15 @@ namespace backlog.Auth
 {
     public class MSAL
     {
-        private const string ClientId = "c81b068d-ab10-4c00-a24d-08c3a1a6b7c6";
+        private const string ClientId = "4a1aa1d5-c567-49d0-ad0b-cd957a47f842"; //"c81b068d-ab10-4c00-a24d-08c3a1a6b7c6";
         private static readonly string MSGraphURL = "https://graph.microsoft.com/v1.0/";
         private static GraphServiceClient graphServiceClient = null;
+        
         private static IPublicClientApplication PublicClientApplication;
+        private static AuthenticationResult authResult;
+
+        private const string Tenant = "common"; // Alternatively "[Enter your tenant, as obtained from the azure portal, e.g. kko365.onmicrosoft.com]"
+        private const string Authority = "https://login.microsoftonline.com/" + Tenant;
 
         private static string[] scopes = new string[]
         {
@@ -44,9 +51,12 @@ namespace backlog.Auth
         public async static Task<string> SignInAndGetAuthResult()
         {
             string sid = WebAuthenticationBroker.GetCurrentApplicationCallbackUri().Host.ToUpper();
+            //string sid = "S-1-15-2-2566872105-1906516075-403359635-2971900813-1913047554-2806970718-2761120688"; 
 
             // the redirect uri you need to register
-            string redirectUri = $"ms-appx-web://microsoft.aad.brokerplugin/S-1-15-2-2566872105-1906516075-403359635-2971900813-1913047554-2806970718-2761120688";
+            string redirectUri =
+               // $"ms-appx-web://microsoft.aad.brokerplugin/S-1-15-2-2566872105-1906516075-403359635-2971900813-1913047554-2806970718-2761120688";
+               $"{Authority}";
 
             AuthenticationResult authResult;
 
@@ -54,13 +64,21 @@ namespace backlog.Auth
                             .WithBroker(true)
                             .WithRedirectUri(redirectUri)
                             .Build();
-            var accounts = await PublicClientApplication.GetAccountsAsync();
-            var accountToLogin = accounts.FirstOrDefault();
+
+            IEnumerable<IAccount> accounts = await PublicClientApplication.GetAccountsAsync();
+            IAccount accountToLogin = accounts.FirstOrDefault();
+            
             try
             {
-                // 4. AcquireTokenSilent 
+
+                // * AcquireTokenSilent case *
                 authResult = await PublicClientApplication.AcquireTokenSilent(scopes, accountToLogin)
                                           .ExecuteAsync();
+
+                // * AcquireTokenInteractive case *
+                //authResult = await PublicClientApplication.AcquireTokenInteractive(scopes)
+                //.WithAccount(accountToLogin)  // this already exists in MSAL, but it is more important for WAM
+                //.ExecuteAsync();
             }
             catch (MsalUiRequiredException) // no change in the pattern
             {
@@ -68,6 +86,7 @@ namespace backlog.Auth
                  .WithAccount(accountToLogin)  // this already exists in MSAL, but it is more important for WAM
                  .ExecuteAsync();
             }
+
             if(authResult != null)
             {
                 Settings.IsSignedIn = true;
@@ -75,14 +94,81 @@ namespace backlog.Auth
             return authResult.AccessToken;
         }
 
-        private async static Task<GraphServiceClient> SignInAndInitializeGraphServiceClient()
+        private async static Task<GraphServiceClient> SignInAndInitializeGraphServiceClient(string[] scopes)
         {
-            GraphServiceClient graphClient = new GraphServiceClient(MSGraphURL,
-            new DelegateAuthenticationProvider(async (requestMessage) => {
-                requestMessage.Headers.Authorization = new AuthenticationHeaderValue("bearer", await SignInAndGetAuthResult());
-            }));
+            /*
+            GraphServiceClient graphClient = new GraphServiceClient
+            (
+                MSGraphURL,
+                new DelegateAuthenticationProvider
+                (
+                    async (requestMessage) => 
+                    {
+                        requestMessage.Headers.Authorization = new AuthenticationHeaderValue
+                        (
+                            "bearer", 
+                            await SignInAndGetAuthResult()
+                        );
+                    }
+                )
+            );
 
             return await Task.FromResult(graphClient);
+            */
+
+            GraphServiceClient graphClient = new GraphServiceClient
+            (
+                MSGraphURL,
+                new DelegateAuthenticationProvider(async (requestMessage) =>
+                {
+                    requestMessage.Headers.Authorization = new AuthenticationHeaderValue
+                    ("bearer", await SignInUserAndGetTokenUsingMSAL(scopes));
+                }));
+
+            return await Task.FromResult(graphClient);
+        }
+
+
+        /// <summary>
+        /// Signs in the user and obtains an Access token for MS Graph
+        /// </summary>
+        /// <param name="scopes"></param>
+        /// <returns> Access Token</returns>
+        private static async Task<string> SignInUserAndGetTokenUsingMSAL(string[] scopes)
+        {
+            // Initialize the MSAL library by building a public client application
+            PublicClientApplication = PublicClientApplicationBuilder.Create(ClientId)
+                .WithAuthority(Authority)
+                .WithUseCorporateNetwork(false)
+                .WithRedirectUri(DefaultRedirectUri.Value)
+                 .WithLogging((level, message, containsPii) =>
+                 {
+                     Debug.WriteLine($"MSAL: {level} {message} ");
+                 }, LogLevel.Warning, enablePiiLogging: false, enableDefaultPlatformLogging: true)
+                .Build();
+
+            // It's good practice to not do work on the UI thread, so use ConfigureAwait(false) whenever possible.
+            IEnumerable<IAccount> accounts = 
+                await PublicClientApplication.GetAccountsAsync().ConfigureAwait(false);
+
+            IAccount firstAccount = accounts.FirstOrDefault();
+
+            try
+            {
+                authResult = await PublicClientApplication.AcquireTokenSilent(scopes, firstAccount)
+                                                  .ExecuteAsync();
+            }
+            catch (MsalUiRequiredException ex)
+            {
+                // A MsalUiRequiredException happened on AcquireTokenSilentAsync. This indicates you need to call AcquireTokenAsync to acquire a token
+                Debug.WriteLine($"MsalUiRequiredException: {ex.Message}");
+
+                authResult = await PublicClientApplication.AcquireTokenInteractive(scopes)
+                                                  .ExecuteAsync()
+                                                  .ConfigureAwait(false);
+
+            }
+            return authResult.AccessToken;
         }
 
         /// <summary>
@@ -93,7 +179,9 @@ namespace backlog.Auth
         {
             if (graphServiceClient == null)
             {
-                graphServiceClient = await SignInAndInitializeGraphServiceClient().ConfigureAwait(false);
+                graphServiceClient = await 
+                    SignInAndInitializeGraphServiceClient(MSAL.scopes).ConfigureAwait(false);
+                
                 try
                 {
                     await Logger.Info("Fetching graph service client.....");

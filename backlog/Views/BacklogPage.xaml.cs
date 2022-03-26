@@ -150,10 +150,21 @@ namespace backlog.Views
             }
             finally
             {
-                Frame.Navigate(prevPage?.SourcePageType, backlogIndex, new SuppressNavigationTransitionInfo());
+                Frame.Navigate(prevPage?.SourcePageType, backlogIndex, 
+                    new SuppressNavigationTransitionInfo());
             }
+
             if (edited)
-                await SaveBacklog();
+            {
+                try
+                {
+                    await SaveBacklog();
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine("[ex] SaveBacklog Exception: " + ex.Message);
+                }
+            }
         }
 
         /// <summary>
@@ -236,6 +247,7 @@ namespace backlog.Views
                     await contentDialog.ShowAsync();
                     return;
                 }
+
                 string date = DatePicker.SelectedDates[0].ToString("D", CultureInfo.InvariantCulture);
                 DateTimeOffset dateTime = DateTimeOffset.Parse(date, CultureInfo.InvariantCulture).Add(TimePicker.Time);
                 int diff = DateTimeOffset.Compare(dateTime, DateTimeOffset.Now);
@@ -266,8 +278,27 @@ namespace backlog.Views
                 }
             }
             ProgBar.Visibility = Visibility.Visible;
-            backlog.TargetDate = DatePicker.SelectedDates[0].ToString("D", CultureInfo.InvariantCulture);
-            backlog.NotifTime = TimePicker.Time;
+
+            // Date
+            try
+            {
+                backlog.TargetDate = DatePicker.SelectedDates[0].ToString("D", CultureInfo.InvariantCulture);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("[ex]  DatePicker.Date Exception: " + ex.Message);
+            }
+
+            // Time
+            try
+            {
+                backlog.NotifTime = TimePicker.Time;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("[ex]  TimePicker.Time Exception: " + ex.Message);
+            }
+
             await SaveBacklog();
             CmdCancelButton_Click(sender, e);
             ProgBar.Visibility = Visibility.Collapsed;

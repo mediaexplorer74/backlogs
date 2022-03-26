@@ -7,6 +7,7 @@ using Microsoft.Graph;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.NetworkInformation;
@@ -49,14 +50,19 @@ namespace backlog.Views
         bool signedIn;
         int backlogIndex = -1;
         bool sync = false;
+
+        // BacklogsPage
         public BacklogsPage()
         {
             this.InitializeComponent();
             isNetworkAvailable = NetworkInterface.GetIsNetworkAvailable();
             Task.Run(async () => { await SaveData.GetInstance().ReadDataAsync(); }).Wait();
             InitBacklogs();
-        }
 
+        }//BacklogsPage
+
+
+        // OnNavigatedTo
         protected async override void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
@@ -78,7 +84,16 @@ namespace backlog.Views
             {
                 await Logger.Info("Signing in user....");
                 graphServiceClient = await MSAL.GetGraphServiceClient();
-                await SetUserPhotoAsync();
+
+                try
+                {
+                    await SetUserPhotoAsync();
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine("[ex] Exception: " + ex.Message);
+                }
+
                 TopProfileButton.Visibility = Visibility.Visible;
                 BottomProfileButton.Visibility = Visibility.Visible;
                 if (sync)
@@ -89,11 +104,15 @@ namespace backlog.Views
                 }
             }
             ProgBar.Visibility = Visibility.Collapsed;
-        }
+
+        }//OnNavigatedTo
+
 
         /// <summary>
         /// Initalize backlogs
         /// </summary>
+
+        // InitBacklogs
         private void InitBacklogs()
         {
             allBacklogs = SaveData.GetInstance().GetBacklogs();
@@ -108,7 +127,8 @@ namespace backlog.Views
             var view = SystemNavigationManager.GetForCurrentView();
             view.AppViewBackButtonVisibility = AppViewBackButtonVisibility.Visible;
             view.BackRequested += View_BackRequested;
-        }
+
+        }//InitBacklogs
 
         private void View_BackRequested(object sender, BackRequestedEventArgs e)
         {
@@ -121,11 +141,14 @@ namespace backlog.Views
                 Frame.Navigate(typeof(MainPage));
             }
             e.Handled = true;
-        }
+
+        }//View_BackRequested
 
         /// <summary>
         /// Populate the backlogs list with up-to-date backlogs
         /// </summary>
+        /// 
+        // PopulateBacklogs
         private void PopulateBacklogs()
         {
             var readBacklogs = SaveData.GetInstance().GetBacklogs().Where(b => b.IsComplete == false);
@@ -167,12 +190,31 @@ namespace backlog.Views
                 musicBacklogs.Add(b);
             }
             ShowEmptyMessage();
-        }
 
+        }//PopulateBacklogs
+
+
+        // ShowEmptyMessage
         private void ShowEmptyMessage()
         {
-            ObservableCollection<Backlog>[] _backlogs = { backlogs, filmBacklogs, tvBacklogs, gameBacklogs, musicBacklogs, bookBacklogs };
-            TextBlock[] textBlocks = { EmptyListText, EmptyFilmsText, EmptyTVText, EmptyGamesText, EmptyMusicText, EmptyBooksText };
+            ObservableCollection<Backlog>[] _backlogs = 
+            { 
+                backlogs, 
+                filmBacklogs, 
+                tvBacklogs, 
+                gameBacklogs, 
+                musicBacklogs, 
+                bookBacklogs 
+            };
+            TextBlock[] textBlocks = 
+            { 
+                EmptyListText, 
+                EmptyFilmsText, 
+                EmptyTVText, 
+                EmptyGamesText, 
+                EmptyMusicText, 
+                EmptyBooksText 
+            };
             for (int i = 0; i < _backlogs.Length; i++)
             {
                 if (_backlogs[i].Count <= 0)
@@ -188,7 +230,7 @@ namespace backlog.Views
                     textBlocks[i].Visibility = Visibility.Collapsed;
                 }
             }
-        }
+        }//ShowEmptyMessage
 
         /// <summary>
         /// Set the user photo in the command bar
@@ -204,7 +246,12 @@ namespace backlog.Views
             try
             {
                 var accountPicFile = await cacheFolder.GetFileAsync("profile.png");
-                using (IRandomAccessStream stream = await accountPicFile.OpenAsync(FileAccessMode.Read))
+                
+                using 
+                    (
+                        IRandomAccessStream stream = 
+                        await accountPicFile.OpenAsync(FileAccessMode.Read)
+                    )
                 {
                     BitmapImage image = new BitmapImage();
                     stream.Seek(0);
@@ -217,7 +264,8 @@ namespace backlog.Views
             {
                 await Logger.Error("Error settings", ex);
             }
-        }
+        }//SetUserPhotoAsync
+
 
         /// <summary>
         /// Opens the Backlog details page
@@ -232,25 +280,36 @@ namespace backlog.Views
             switch (pivotItem.Header.ToString())
             {
                 default:
-                    BacklogsGrid.PrepareConnectedAnimation("cover", selectedBacklog, "coverImage");
+                    BacklogsGrid.PrepareConnectedAnimation
+                        ("cover", selectedBacklog, "coverImage");
                     break;
                 case "films":
-                    FilmsGrid.PrepareConnectedAnimation("cover", selectedBacklog, "coverImage");
+                    FilmsGrid.PrepareConnectedAnimation
+                        ("cover", selectedBacklog, "coverImage");
                     break;
                 case "tv":
-                    TVGrid.PrepareConnectedAnimation("cover", selectedBacklog, "coverImage");
+                    TVGrid.PrepareConnectedAnimation
+                        ("cover", selectedBacklog, "coverImage");
                     break;
                 case "books":
-                    BooksGrid.PrepareConnectedAnimation("cover", selectedBacklog, "coverImage");
+                    BooksGrid.PrepareConnectedAnimation
+                        ("cover", selectedBacklog, "coverImage");
                     break;
                 case "games":
-                    GamesGrid.PrepareConnectedAnimation("cover", selectedBacklog, "coverImage");
+                    GamesGrid.PrepareConnectedAnimation
+                        ("cover", selectedBacklog, "coverImage");
                     break;
                 case "albums":
-                    AlbumsGrid.PrepareConnectedAnimation("cover", selectedBacklog, "coverImage");
+                    AlbumsGrid.PrepareConnectedAnimation
+                        ("cover", selectedBacklog, "coverImage");
                     break;
             }
-            Frame.Navigate(typeof(BacklogPage), selectedBacklog.id, new SuppressNavigationTransitionInfo());
+            Frame.Navigate
+                (
+                typeof(BacklogPage), 
+                selectedBacklog.id, 
+                new SuppressNavigationTransitionInfo()
+                );
         }
 
         /// <summary>
@@ -268,7 +327,7 @@ namespace backlog.Views
             {
                 Frame.Navigate(typeof(CreatePage));
             }
-        }
+        }// CreateButton_Click
 
         /// <summary>
         /// Opens the Setting page
@@ -278,7 +337,9 @@ namespace backlog.Views
         private void SettingsButton_Click(object sender, RoutedEventArgs e)
         {
             Frame.Navigate(typeof(SettingsPage));
-        }
+        }// SettingsButton_Click
+
+
 
         /// <summary>
         /// Sync backlogs
@@ -288,8 +349,11 @@ namespace backlog.Views
         private void SyncButton_Click(object sender, RoutedEventArgs e)
         {
             Frame.Navigate(typeof(BacklogsPage), "sync");
-        }
 
+        }//SyncButton_Click
+
+
+        // CompletedBacklogsButton_Click
         private void CompletedBacklogsButton_Click(object sender, RoutedEventArgs e)
         {
             try
@@ -300,33 +364,49 @@ namespace backlog.Views
             {
                 Frame.Navigate(typeof(CompletedBacklogsPage));
             }
-        }
+        }//CompletedBacklogsButton_Click
+
+
+
         /// <summary>
         /// Finish connected animation
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
+        /// 
+        // BacklogsGrid_Loaded
         private async void BacklogsGrid_Loaded(object sender, RoutedEventArgs e)
         {
             if (backlogIndex != -1)
             {
-                ConnectedAnimation animation = ConnectedAnimationService.GetForCurrentView().GetAnimation("backAnimation");
+                ConnectedAnimation animation = 
+                    ConnectedAnimationService.GetForCurrentView().GetAnimation("backAnimation");
                 try
                 {
-                    await BacklogsGrid.TryStartConnectedAnimationAsync(animation, allBacklogs[backlogIndex], "coverImage");
+                    await BacklogsGrid.TryStartConnectedAnimationAsync
+                        (
+                            animation, 
+                            allBacklogs[backlogIndex], 
+                            "coverImage"
+                        );
                 }
                 catch
                 {
                     // : )
                 }
             }
-        }
 
+        }//BacklogsGrid_Loaded
+
+
+        // SearchButton_Click
         private async void SearchButton_Click(object sender, RoutedEventArgs e)
         {
             await SearchDialog.ShowAsync();
-        }
+        }//SearchButton_Click
 
+
+        // SearchBox_TextChanged
         private void SearchBox_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
         {
             if (args.Reason == AutoSuggestionBoxTextChangeReason.UserInput)
@@ -351,13 +431,16 @@ namespace backlog.Views
                 sender.ItemsSource = suggestions;
 
             }
-        }
+        }//SearchBox_TextChanged
 
+
+        // SearchBox_QuerySubmitted
         private void SearchBox_QuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
         {
             var selectedBacklog = backlogs.FirstOrDefault(b => b.Name == args.ChosenSuggestion.ToString());
             SearchDialog.Hide();
             Frame.Navigate(typeof(BacklogPage), selectedBacklog.id, null);
-        }
+
+        }//SearchBox_QuerySubmitted
     }
 }

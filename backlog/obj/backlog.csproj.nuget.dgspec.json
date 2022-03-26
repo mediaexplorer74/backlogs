@@ -1,24 +1,26 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\surya\\git\\backlogs\\backlog\\backlog.csproj": {}
+    "C:\\Users\\media\\source\\repos\\backlogs-0.9.2\\backlog\\backlog.csproj": {}
   },
   "projects": {
-    "C:\\Users\\surya\\git\\backlogs\\backlog\\backlog.csproj": {
+    "C:\\Users\\media\\source\\repos\\backlogs-0.9.2\\backlog\\backlog.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\surya\\git\\backlogs\\backlog\\backlog.csproj",
+        "projectUniqueName": "C:\\Users\\media\\source\\repos\\backlogs-0.9.2\\backlog\\backlog.csproj",
         "projectName": "backlog",
-        "projectPath": "C:\\Users\\surya\\git\\backlogs\\backlog\\backlog.csproj",
-        "packagesPath": "C:\\Users\\surya\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\surya\\git\\backlogs\\backlog\\obj\\",
+        "projectPath": "C:\\Users\\media\\source\\repos\\backlogs-0.9.2\\backlog\\backlog.csproj",
+        "packagesPath": "C:\\Users\\media\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\media\\source\\repos\\backlogs-0.9.2\\backlog\\obj\\",
         "projectStyle": "PackageReference",
         "skipContentFileWrite": true,
         "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages",
           "C:\\Program Files (x86)\\Microsoft SDKs\\UWPNuGetPackages\\"
         ],
         "configFilePaths": [
-          "C:\\Users\\surya\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\media\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [

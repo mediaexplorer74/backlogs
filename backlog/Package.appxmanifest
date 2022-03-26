@@ -7,15 +7,15 @@
   IgnorableNamespaces="uap mp">
 
   <Identity
-    Name="37533SuryaKashyap.Backlogs"
-    Publisher="CN=7115D965-9BEF-4D32-9397-2F0F733B3D6D"
-    Version="0.9.3.0" />
+    Name="ME.Backlogs"
+    Publisher="CN=media"
+    Version="0.9.2.0" />
 
   <mp:PhoneIdentity PhoneProductId="af8238ee-b880-4e0d-9580-215f87474c52" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 
   <Properties>
-    <DisplayName>Backlogs</DisplayName>
-    <PublisherDisplayName>Surya K</PublisherDisplayName>
+    <DisplayName>Backlogs 0.9.2</DisplayName>
+    <PublisherDisplayName>mediaexplorer</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
   </Properties>
 
@@ -47,7 +47,8 @@
         <uap:SplashScreen Image="Assets\SplashScreen.png"  BackgroundColor="transparent"/>
         <uap:InitialRotationPreference>
           <uap:Rotation Preference="landscape"/>
-          <uap:Rotation Preference="portrait"/></uap:InitialRotationPreference>
+          <uap:Rotation Preference="portrait"/>
+          <uap:Rotation Preference="landscapeFlipped"/></uap:InitialRotationPreference>
       </uap:VisualElements>
       <Extensions>
         <uap:Extension Category="windows.fileTypeAssociation">

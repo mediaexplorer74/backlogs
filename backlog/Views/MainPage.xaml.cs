@@ -1,4 +1,6 @@
-﻿using System;
+﻿// MainPage
+
+using System;
 using System.Linq;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -24,13 +26,11 @@ using backlog.Auth;
 using System.Collections.Generic;
 using System.Diagnostics;
 
-// The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
 
+// backlog.Views namespace
 namespace backlog.Views
 {
-    /// <summary>
-    /// An empty page that can be used on its own or navigated to within a Frame.
-    /// </summary>
+    // MainPage class 
     public sealed partial class MainPage : Page
     {
         private ObservableCollection<Backlog> allBacklogs { get; set; }
@@ -56,6 +56,7 @@ namespace backlog.Views
 
         Guid randomBacklogId = new Guid();
 
+        // MainPage
         public MainPage()
         {
             this.InitializeComponent();
@@ -70,11 +71,16 @@ namespace backlog.Views
             LoadBacklogs();
             var view = SystemNavigationManager.GetForCurrentView();
             view.AppViewBackButtonVisibility = AppViewBackButtonVisibility.Disabled;
-        }
+
+        }//MainPage
+
+
 
         /// <summary>
         /// Shows the teaching tips on fresh install
         /// </summary>
+        
+        // ShowTeachingTips
         private void ShowTeachingTips()
         {
             if(Settings.IsFirstRun)
@@ -93,14 +99,16 @@ namespace backlog.Views
                     BottomSigninTeachingTip.IsOpen = true;
                 }
             }
-        }
+        }//ShowTeachingTips
 
+
+        // OnNavigatedTo
         protected async override void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
-            if (e.Parameter != null && e.Parameter.ToString() != "")
+            if(e.Parameter != null && e.Parameter.ToString() != "")
             {
-                if (e.Parameter.ToString() == "sync")
+                if(e.Parameter.ToString() == "sync")
                 {
                     sync = true;
                 }
@@ -116,22 +124,31 @@ namespace backlog.Views
             {
                 await Logger.Info("Signing in user....");
                 graphServiceClient = await MSAL.GetGraphServiceClient();
-                await SetUserPhotoAsync();
+
+                try
+                {
+                    await SetUserPhotoAsync();
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine("[ex] Exception: " + ex.Message);
+                }
+
                 TopSigninButton.Visibility = Visibility.Collapsed;
                 BottomSigninButton.Visibility = Visibility.Collapsed;
                 TopProfileButton.Visibility = Visibility.Visible;
                 BottomProfileButton.Visibility = Visibility.Visible;
+                await SaveData.GetInstance().ReadDataAsync(sync);
                 LoadBacklogs();
-                if(sync)
-                {
-                    await SaveData.GetInstance().ReadDataAsync(true);
-                    BuildNotifactionQueue();
-                }
+                BuildNotifactionQueue();
             }
             ShowTeachingTips();
             ProgBar.Visibility = Visibility.Collapsed;
-        }
 
+        }//OnNavigatedTo
+
+
+        // LoadBacklogs
         private void LoadBacklogs()
         {
             recentlyAdded.Clear();
@@ -193,16 +210,30 @@ namespace backlog.Views
                 suggestionsGrid.Visibility = Visibility.Collapsed;
                 InputPanel.Visibility = Visibility.Collapsed;
             }
-        }
+
+        }//LoadBacklogs
+
+
 
         /// <summary>
         /// Set the user photo in the command bar
         /// </summary>
         /// <returns></returns>
+        
+        // SetUserPhotoAsync
         private async Task SetUserPhotoAsync()
         {
             await Logger.Info("Setting user photo....");
+            Debug.WriteLine("[i] Setting user photo....");
+
             string userName = Settings.UserName;
+
+            // TODO / RnD / TEMP
+            if (userName == null)
+            {
+                userName = "ME";
+            }
+
             TopProfileButton.Label = userName;
             BottomProfileButton.Label = userName;
             var cacheFolder = ApplicationData.Current.LocalCacheFolder;
@@ -221,9 +252,10 @@ namespace backlog.Views
             catch (Exception ex)
             {
                 await Logger.Error("Error settings", ex);
+                Debug.WriteLine("[ex] Error settings : " + ex.Message);
             }
-            
-        }
+
+        }//SetUserPhotoAsync
 
 
         /// <summary>
@@ -231,6 +263,8 @@ namespace backlog.Views
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
+
+        // SigninButton_Click
         private async void SigninButton_Click(object sender, RoutedEventArgs e)
         {
             ProgBar.Visibility = Visibility.Visible;
@@ -257,24 +291,31 @@ namespace backlog.Views
                 };
                 _ = await contentDialog.ShowAsync();
             }
-        }
+        }//
+
 
         /// <summary>
         /// Opens the Create page
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
+        /// 
+        // CreateButton_Click
         private void CreateButton_Click(object sender, RoutedEventArgs e)
         {
             try
             {
-                Frame.Navigate(typeof(CreatePage), null, new SlideNavigationTransitionInfo() { Effect = SlideNavigationTransitionEffect.FromBottom});
+                Frame.Navigate(typeof(CreatePage), null, new SlideNavigationTransitionInfo() 
+                { 
+                    Effect = SlideNavigationTransitionEffect.FromBottom}
+                );
             }
             catch
             {
                 Frame.Navigate(typeof(CreatePage));
             }
-        }
+        }//CreateButton_Click
+
 
         /// <summary>
         /// Opens the Setting page
@@ -284,54 +325,65 @@ namespace backlog.Views
         private void SettingsButton_Click(object sender, RoutedEventArgs e)
         {
             Frame.Navigate(typeof(SettingsPage));
-        }
+        }//SettingsButton_Click
 
         /// <summary>
         /// Launches the Store rating page for the app
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
+
+        // RateButton_Click
         private async void RateButton_Click(object sender, RoutedEventArgs e)
         {
             var ratingUri = new Uri(@"ms-windows-store://review/?ProductId=9N2H8CM2KWVZ");
             await Windows.System.Launcher.LaunchUriAsync(ratingUri);
-        }
+        }//RateButton_Click
+
+
 
         /// <summary>
         /// Build the notif queue based on whether backlogs have notif time
         /// </summary>
+
+        // BuildNotifactionQueue
         private void BuildNotifactionQueue()
         {
-            if(recentlyAdded != null)
+            if(backlogs != null)
             {
-                foreach (var b in recentlyAdded.Take(5))
+                foreach (var b in new ObservableCollection<Backlog>(backlogs.OrderByDescending(b => b.TargetDate)))
                 {
-                    //if (b.TargetDate != "None")
-                    //{
-                    //    var savedNotifTime = Settings.GetNotifTime(b.id.ToString());
-                    //    if (savedNotifTime == "" || savedNotifTime != b.NotifTime.ToString())
-                    //    {
-                    //        DateTimeOffset date = DateTimeOffset.Parse(b.TargetDate, CultureInfo.InvariantCulture).Add(b.NotifTime);
-                    //        int result = DateTimeOffset.Compare(date, DateTimeOffset.Now);
-                    //        if (result > 0)
-                    //        {
-                    //            var builder = new ToastContentBuilder()
-                    //            .AddText($"Hey there!", hintMaxLines: 1)
-                    //            .AddText($"You wanted to check out {b.Name} by {b.Director} today. Here's your reminder!", hintMaxLines: 2)
-                    //            .AddHeroImage(new Uri(b.ImageURL));
-                    //            ScheduledToastNotification toastNotification = new ScheduledToastNotification(builder.GetXml(), date);
-                    //            ToastNotificationManager.CreateToastNotifier().AddToSchedule(toastNotification);
-                    //        }
-                    //        Settings.SetNotifTime(b.id.ToString(), b.NotifTime.ToString());
-                    //    }
-                    //}
+                    if (b.TargetDate != "None")
+                    {
+                        var savedNotifTime = Settings.GetNotifTime(b.id.ToString());
+                        if (savedNotifTime == "" || savedNotifTime != b.NotifTime.ToString())
+                        {
+                            DateTimeOffset date = DateTimeOffset.Parse(b.TargetDate, CultureInfo.InvariantCulture).Add(b.NotifTime);
+                            int result = DateTimeOffset.Compare(date, DateTimeOffset.Now);
+                            if (result > 0)
+                            {
+                                var builder = new ToastContentBuilder()
+                                .AddText($"Hey there!", hintMaxLines: 1)
+                                .AddText($"You wanted to check out {b.Name} by {b.Director} today. Here's your reminder!", hintMaxLines: 2)
+                                .AddHeroImage(new Uri(b.ImageURL));
+
+                                ScheduledToastNotification toastNotification = 
+                                    new ScheduledToastNotification(builder.GetXml(), date);
+
+                                ToastNotificationManager.CreateToastNotifier().AddToSchedule(toastNotification);
+                            }
+                            Settings.SetNotifTime(b.id.ToString(), b.NotifTime.ToString());
+                        }
+                    }
                     bool showLiveTile = Settings.ShowLiveTile;
                     if (showLiveTile)
                         GenerateLiveTiles(b);
                 }
             }
-        }
+        }//BuildNotifactionQueue
 
+
+        // GenerateLiveTiles
         private void GenerateLiveTiles(Backlog b)
         {
             var tileContent = new TileContent()
@@ -409,40 +461,50 @@ namespace backlog.Views
 
             // And send the notification to the primary tile
             TileUpdateManager.CreateTileUpdaterForApplication().Update(tileNotif);
-        }
 
+        }//GenerateLiveTiles
+
+
+        // ShareButton_Click
         private void ShareButton_Click(object sender, RoutedEventArgs e)
         {
             DataTransferManager dataTransferManager = DataTransferManager.GetForCurrentView();
             dataTransferManager.DataRequested += DataTransferManager_DataRequested;
             DataTransferManager.ShowShareUI();
-        }
+        }//ShareButton_Click
 
+        // DataTransferManager_DataRequested
         private void DataTransferManager_DataRequested(DataTransferManager sender, DataRequestedEventArgs args)
         {
             DataRequest request = args.Request;
             request.Data.SetText("https://www.microsoft.com/store/apps/9N2H8CM2KWVZ");
             request.Data.Properties.Title = "https://www.microsoft.com/store/apps/9N2H8CM2KWVZ";
             request.Data.Properties.Description = "Share this app with your contacts";
-        }
+        }//DataTransferManager_DataRequested
 
 
+        // SupportButton_Click
         private async void SupportButton_Click(object sender, RoutedEventArgs e)
         {
             var ratingUri = new Uri(@"https://paypal.me/surya4822?locale.x=en_US");
             await Windows.System.Launcher.LaunchUriAsync(ratingUri);
-        }
+        }//SupportButton_Click
+
 
         /// <summary>
         /// Sync backlogs
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
+
+        // SyncButton_Click
         private void SyncButton_Click(object sender, RoutedEventArgs e)
         {
             Frame.Navigate(typeof(MainPage), "sync");
-        }
+        }//SyncButton_Click
 
+
+        // CompletedBacklogsButton_Click
         private void CompletedBacklogsButton_Click(object sender, RoutedEventArgs e)
         {
             try
@@ -453,20 +515,30 @@ namespace backlog.Views
             {
                 Frame.Navigate(typeof(CompletedBacklogsPage));
             }
-        }
 
+        }//CompletedBacklogsButton_Click end
+
+
+        // BacklogsButton_Click
         private void BacklogsButton_Click(object sender, RoutedEventArgs e)
         {
             Frame.Navigate(typeof(BacklogsPage), "sync");
-        }
 
+        }//BacklogsButton_Click
+
+
+        // AddedBacklogsGrid_ItemClick
         private void AddedBacklogsGrid_ItemClick(object sender, ItemClickEventArgs e)
         {
             var selectedBacklog = (Backlog)e.ClickedItem;
             AddedBacklogsGrid.PrepareConnectedAnimation("cover", selectedBacklog, "coverImage");
-            Frame.Navigate(typeof(BacklogPage), selectedBacklog.id, new SuppressNavigationTransitionInfo());
-        }
 
+            Frame.Navigate(typeof(BacklogPage), selectedBacklog.id, new SuppressNavigationTransitionInfo());
+        
+        }//AddedBacklogsGrid_ItemClick
+
+
+        // AddedBacklogsGrid_Loaded
         private async void AddedBacklogsGrid_Loaded(object sender, RoutedEventArgs e)
         {
             if (backlogIndex != -1)
@@ -481,23 +553,29 @@ namespace backlog.Views
                     // : )
                 }
             }
-        }
+        }//AddedBacklogsGrid_Loaded
 
         private void AllAddedButton_Click(object sender, RoutedEventArgs e)
         {
             BacklogsButton_Click(sender, e);
         }
 
+
+        // AllCompletedButton_Click
         private void AllCompletedButton_Click(object sender, RoutedEventArgs e)
         {
             CompletedBacklogsButton_Click(sender, e);
-        }
+        }//AllCompletedButton_Click
 
+
+        // GoButton_Click
         private void GoButton_Click(object sender, RoutedEventArgs e)
         {
             GenerateRandomBacklog();
-        }
+        }//GoButton_Click
 
+
+        // GenerateRandomBacklog
         private async void GenerateRandomBacklog()
         {
             var type = TypeComoBox.SelectedItem.ToString();
@@ -566,13 +644,18 @@ namespace backlog.Views
                 suggestionCover.Source = new BitmapImage(new Uri(randomBacklog.ImageURL));
                 randomBacklogId = randomBacklog.id;
             }
-        }
 
+        }//GenerateRandomBacklog
+
+
+        // Hyperlink_Click
         private void Hyperlink_Click(Windows.UI.Xaml.Documents.Hyperlink sender, Windows.UI.Xaml.Documents.HyperlinkClickEventArgs args)
         {
             Frame.Navigate(typeof(BacklogPage), randomBacklogId, null);
-        }
+        }//Hyperlink_Click
 
+
+        // ShowErrorMessage
         private async Task ShowErrorMessage(string message)
         {
             ContentDialog contentDialog = new ContentDialog()
@@ -581,9 +664,13 @@ namespace backlog.Views
                 Content = message,
                 CloseButtonText = "Ok"
             };
-            await contentDialog.ShowAsync();
-        }
 
+            await contentDialog.ShowAsync();
+
+        }//ShowErrorMessage
+
+
+        // ImportButton_Click
         private async void ImportButton_Click(object sender, RoutedEventArgs e)
         {
             var picker = new Windows.Storage.Pickers.FileOpenPicker();
@@ -592,12 +679,22 @@ namespace backlog.Views
             picker.FileTypeFilter.Add(".bklg");
 
             StorageFile file = await picker.PickSingleFileAsync();
-            StorageFolder tempFolder = ApplicationData.Current.TemporaryFolder;
-            await tempFolder.CreateFileAsync(file.Name, CreationCollisionOption.ReplaceExisting);
-            string json = await FileIO.ReadTextAsync(file);
-            var stFile = await tempFolder.GetFileAsync(file.Name);
-            await FileIO.WriteTextAsync(stFile, json);
-            Frame.Navigate(typeof(ImportBacklog), stFile.Name, null);
-        }
-    }
-}
+            
+            // hadle Cancel mode 
+            if (file != null)
+            {
+                StorageFolder tempFolder = ApplicationData.Current.TemporaryFolder;
+                await tempFolder.CreateFileAsync(file.Name, CreationCollisionOption.ReplaceExisting);
+                string json = await FileIO.ReadTextAsync(file);
+                var stFile = await tempFolder.GetFileAsync(file.Name);
+                await FileIO.WriteTextAsync(stFile, json);
+
+                Frame.Navigate(typeof(ImportBacklog), stFile.Name, null);
+            }
+                        
+
+        }//ImportButton_Click
+
+    }//class end
+
+}//namespace end
