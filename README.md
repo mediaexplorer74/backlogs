@@ -2,6 +2,8 @@
 <h2>Backlogs</h2>
 This is the fork of https://github.com/surya-sk/backlogs
 
+I'm  trying to fix toast notifications, especially for Lumia phone / Win10Mobile
+
 ## About the Original
 Backlogs is a native Windows application that lets you manage your film, TV, music, game and book backlogs all in one place. The app supports cross-device syncing across devices signed in with your Microsoft account.
 
