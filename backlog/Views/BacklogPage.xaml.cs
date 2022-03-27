@@ -102,6 +102,8 @@ namespace backlog.Views
         private async void DeleteButton_Click(object sender, RoutedEventArgs e)
         {
             await Logger.Info("Deleting backlog.....");
+            Debug.WriteLine("[i] Deleting backlog.....");
+
             ContentDialog deleteDialog = new ContentDialog
             {
                 Title = "Delete backlog?",
@@ -114,7 +116,9 @@ namespace backlog.Views
             {
                 await DeleteConfirmation_Click();
             }
-            await Logger.Info("Deleted backlog");
+
+            await Logger.Info("Backlog deleted.");
+            Debug.WriteLine("[i] Backlog deleted.");
         }
 
         /// <summary>
@@ -146,7 +150,11 @@ namespace backlog.Views
             catch (Exception ex)
             {
                 await Logger.Warn("Error occured during navigation:");
+                Debug.WriteLine("[w] Error occured during navigation:");
+
                 await Logger.Trace(ex.StackTrace);
+                Debug.WriteLine( "Message(" + ex.Message + ")" );
+                Debug.WriteLine( "StackTrace("+ex.StackTrace + ")" );
             }
             finally
             {
@@ -160,9 +168,9 @@ namespace backlog.Views
                 {
                     await SaveBacklog();
                 }
-                catch (Exception ex)
+                catch (Exception ex1)
                 {
-                    Debug.WriteLine("[ex] SaveBacklog Exception: " + ex.Message);
+                    Debug.WriteLine("[ex] SaveBacklog Exception: " + ex1.Message);
                 }
             }
         }
@@ -184,6 +192,8 @@ namespace backlog.Views
         private async Task SaveBacklog()
         {
             await Logger.Info("Saving backlog....");
+            Debug.WriteLine("[i] Saving backlog....");
+
             backlogs[backlogIndex] = backlog;
             SaveData.GetInstance().SaveSettings(backlogs);
             await SaveData.GetInstance().WriteDataAsync(signedIn);
@@ -197,11 +207,14 @@ namespace backlog.Views
         private async void CompleteButton_Click(object sender, RoutedEventArgs e)
         {
             await Logger.Info("Marking backlog as complete");
+            Debug.WriteLine("[i] Marking backlog as complete");
+
             backlog.IsComplete = true;
             backlog.UserRating = UserRating.Value;
             backlog.CompletedDate = DateTimeOffset.Now.Date.ToString("d", CultureInfo.InvariantCulture);
             await SaveBacklog();
             RatingDialog.Hide();
+
             Frame.Navigate(typeof(MainPage));
         }
 
@@ -284,9 +297,9 @@ namespace backlog.Views
             {
                 backlog.TargetDate = DatePicker.SelectedDates[0].ToString("D", CultureInfo.InvariantCulture);
             }
-            catch (Exception ex)
+            catch (Exception ex1)
             {
-                Debug.WriteLine("[ex]  DatePicker.Date Exception: " + ex.Message);
+                Debug.WriteLine("[ex]  DatePicker.Date Exception: " + ex1.Message);
             }
 
             // Time
@@ -294,9 +307,9 @@ namespace backlog.Views
             {
                 backlog.NotifTime = TimePicker.Time;
             }
-            catch (Exception ex)
+            catch (Exception ex2)
             {
-                Debug.WriteLine("[ex]  TimePicker.Time Exception: " + ex.Message);
+                Debug.WriteLine("[ex]  TimePicker.Time Exception: " + ex2.Message);
             }
 
             await SaveBacklog();

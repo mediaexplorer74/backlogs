@@ -41,7 +41,9 @@ namespace backlog.Views
             if(isNetworkAvailable)
             {
                 await Logger.Info("Fetching backlogs...");
-                if(signedIn)
+                Debug.WriteLine("[i] Fetching backlogs...");
+
+                if (signedIn)
                 {
                     await SaveData.GetInstance().ReadDataAsync(true);
                     backlogs = SaveData.GetInstance().GetBacklogs();
@@ -60,7 +62,10 @@ namespace backlog.Views
                     Content = "You need the internet to create backlogs",
                     CloseButtonText = "Ok"
                 };
+
                 await Logger.Warn("Not connected to the internet");
+                Debug.WriteLine("[w] Not connected to the internet");
+
                 await contentDialog.ShowAsync();
             }
             base.OnNavigatedTo(e);
@@ -104,6 +109,8 @@ namespace backlog.Views
            try
             {
                 await Logger.Info("Creating backlog.....");
+                Debug.WriteLine("[i] Creating backlog.....");
+
                 string title = NameInput.Text;
 
                 if (title == "" || TypeComoBox.SelectedIndex < 0)
@@ -167,7 +174,9 @@ namespace backlog.Views
             catch (Exception ex)
             {
                 Debug.WriteLine(ex.StackTrace);
+
                 await Logger.Error("Failed to create backlog", ex);
+                Debug.WriteLine("[ex] Failed to create backlog" + ex.Message);
             }
         }
 
@@ -243,7 +252,10 @@ namespace backlog.Views
             try
             {
                 string response = await RestClient.GetFilmResponse(title);
+                
                 await Logger.Info($"Trying to find film {title}. Response: {response}");
+                Debug.WriteLine($"[i] Trying to find film {title}. Response: {response}");
+
                 FilmResult filmResult = JsonConvert.DeserializeObject<FilmResult>(response);
                 if(filmResult.results.Length > 0)
                 {
@@ -265,18 +277,23 @@ namespace backlog.Views
                             continue;
                         }
                     }
+                    
                     ResultsListView.ItemsSource = results;
+                    
                     _ = await ResultsDialog.ShowAsync();
+
                     await Logger.Info("Succesfully created backlog");
+                    Debug.WriteLine("[i] Succesfully created backlog");
                 }
                 else
                 {
                     await ShowNotFoundDialog();
                 }
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                await Logger.Error("Failed to find film.", e);
+                await Logger.Error("Failed to find film.", ex);
+                Debug.WriteLine("[ex] Failed to find film: " + ex.Message);
             }
         }
 
@@ -317,8 +334,12 @@ namespace backlog.Views
             try
             {
                 string response = await RestClient.GetMusicResponse(title);
+                
                 await Logger.Info($"Searching for album {title}. Response: {response}");
-                var musicData = JsonConvert.DeserializeObject<MusicData>(response);
+                Debug.WriteLine($"[i] Searching for album {title}. Response: {response}");
+
+                MusicData musicData = JsonConvert.DeserializeObject<MusicData>(response);
+
                 if(musicData != null)
                 {
                     Music music = new Music
@@ -347,17 +368,21 @@ namespace backlog.Views
                         CreatedDate = DateTimeOffset.Now.Date.ToString("D", CultureInfo.InvariantCulture)
                     };
                     await CreateBacklogItem(backlog);
+
                     await Logger.Info("Succesfully created backlog");
+                    Debug.WriteLine("[i] Succesfully created backlog");
                 }
                 else
                 {
                     await ShowNotFoundDialog();
                 }
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
                 await ShowErrorDialog();
-                await Logger.Error("Failed to create backlog", e);
+
+                await Logger.Error("Failed to create backlog", ex);
+                Debug.WriteLine("[ex] Failed to create backlog: " + ex.Message);
             }
         }
 
@@ -373,7 +398,10 @@ namespace backlog.Views
             try
             {
                 string response = await RestClient.GetBookResponse(title);
+
                 await Logger.Info($"Trying to find book {title}. Response {response}");
+                Debug.WriteLine($"[i] Trying to find book {title}. Response {response}");
+
                 var bookData = JsonConvert.DeserializeObject<BookInfo>(response);
                 if(bookData.items.Count > 0)
                 {
@@ -396,17 +424,21 @@ namespace backlog.Views
                         }
                     }
                     ResultsListView.ItemsSource = searchResults;
+
                     _ = await ResultsDialog.ShowAsync();
+
                     await Logger.Info("Succesfully created backlog");
+                    Debug.WriteLine("[i] Succesfully created backlog");
                 }
                 else
                 {
                     await ShowNotFoundDialog();
                 }
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                await Logger.Error("Failed to create backlog", e);
+                await Logger.Error("Failed to create backlog", ex);
+                Debug.WriteLine("[ex] Failed to create backlog: " + ex.Message);
             }
         }
 
@@ -414,8 +446,12 @@ namespace backlog.Views
         {
             var title = NameInput.Text;
             string response = await RestClient.GetBookResponse(title);
+
             await Logger.Info($"Trying to find book {title}. Response {response}");
-            var bookData = JsonConvert.DeserializeObject<BookInfo>(response);
+            Debug.WriteLine($"[i] Trying to find book {title}. Response {response}");
+
+            BookInfo bookData = JsonConvert.DeserializeObject<BookInfo>(response);
+
             Item item = new Item();
             foreach (var i in bookData.items)
             {
@@ -466,8 +502,12 @@ namespace backlog.Views
             try
             {
                 string response = await RestClient.GetSeriesResponse(title);
+                
                 await Logger.Info($"Trying to find series {title}. Response: {response}");
+                Debug.WriteLine($"[i] Trying to find series {title}. Response: {response}");
+
                 SeriesResult seriesResult = JsonConvert.DeserializeObject<SeriesResult>(response);
+                
                 if(seriesResult.results.Length > 0)
                 {
                     ObservableCollection<Models.SearchResult> searchResults = new ObservableCollection<Models.SearchResult>();
@@ -489,18 +529,24 @@ namespace backlog.Views
                         }
                     }
                     ResultsListView.ItemsSource = searchResults;
+
                     _ = await ResultsDialog.ShowAsync();
-                    // SeriesResponse seriesResponse = seriesResult.results[0
+                    
+                    // RnD
+                    // SeriesResponse seriesResponse = seriesResult.results[0...
+                    
                     await Logger.Info("Succesfully created backlog");
+                    Debug.WriteLine("[i] Succesfully created backlog");
                 }
                 else
                 {
                     await ShowNotFoundDialog();
                 }
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                await Logger.Error("Failed to create backlog", e);
+                await Logger.Error("Failed to create backlog", ex);
+                Debug.WriteLine("[ex] Failed to create backlog: " + ex.Message);
             }
         }
 
@@ -541,8 +587,11 @@ namespace backlog.Views
             try
             {
                 string response = await RestClient.GetGameResponse(title);
+
                 await Logger.Info($"Trying to find game {title}. Response: {response}");
-                var result = JsonConvert.DeserializeObject<GameResponse[]>(response);
+                Debug.WriteLine($"Trying to find game {title}. Response: {response}");
+
+                GameResponse[] result = JsonConvert.DeserializeObject<GameResponse[]>(response);
                 if(result.Length > 0)
                 {
                     ObservableCollection<Models.SearchResult> results = new ObservableCollection<Models.SearchResult>();
@@ -578,17 +627,21 @@ namespace backlog.Views
                         }
                     }
                     ResultsListView.ItemsSource = results;
+
                     _ = await ResultsDialog.ShowAsync();
+                    
                     await Logger.Info("Succesfully created backlog");
+                    Debug.WriteLine("[i] Succesfully created backlog");
                 }
                 else
                 {
                     await ShowNotFoundDialog();
                 }
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                await Logger.Error("Failed to create backlog", e);
+                await Logger.Error("Failed to create backlog", ex);
+                Debug.WriteLine("[ex] Failed to create backlog" + ex.Message);
             }
         }
 

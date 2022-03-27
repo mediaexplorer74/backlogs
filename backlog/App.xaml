@@ -40,7 +40,7 @@
                 </ResourceDictionary>
             </ResourceDictionary.ThemeDictionaries>
 
-            <CornerRadius x:Key="ControlCornerRadius">4</CornerRadius>
+            <CornerRadius x:Key="ControlCornerRadius">1</CornerRadius>
 
             <LinearGradientBrush x:Key="HeroImageGradientBrush" StartPoint="0.5,0" EndPoint="0.5,1.5">
                 <GradientStop Offset="0" Color="Transparent"/>
@@ -49,13 +49,13 @@
             </LinearGradientBrush>
 
 
-            <!--  Breakpoints  -->
+            
             <x:Double x:Key="Breakpoint640Plus">641</x:Double>
 
             <Thickness x:Key="PageHeaderDefaultPadding">0</Thickness>
-            <Thickness x:Key="PageHeaderMinimalPadding">-4,0,12,0</Thickness>
+            <Thickness x:Key="PageHeaderMinimalPadding">-4,0,8,0</Thickness>
 
-            <Thickness x:Key="ControlElementScreenshotModePadding">67</Thickness>
+            <Thickness x:Key="ControlElementScreenshotModePadding">64</Thickness>
 
 
             <SolidColorBrush x:Key="GridViewHeaderItemDividerStroke" Color="Transparent"/>

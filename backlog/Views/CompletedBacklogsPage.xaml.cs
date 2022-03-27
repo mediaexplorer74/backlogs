@@ -135,7 +135,7 @@ namespace backlog.Views
             catch (Exception ex)
             {
                 await Logger.Error("Error with connected animation", ex);
-                // ; )
+                Debug.WriteLine("[ex] Error with connected animation" + ex.Message);
             }
 
             PopupImage.Source = new BitmapImage(new Uri(selectedBacklog.ImageURL));

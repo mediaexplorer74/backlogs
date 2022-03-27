@@ -123,6 +123,8 @@ namespace backlog.Views
             if (isNetworkAvailable && signedIn)
             {
                 await Logger.Info("Signing in user....");
+                Debug.WriteLine("[i] Signing in user....");
+
                 graphServiceClient = await MSAL.GetGraphServiceClient();
 
                 try

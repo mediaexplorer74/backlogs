@@ -13,6 +13,7 @@ using backlog.Saving;
 using backlog.Logging;
 using System.Text;
 using backlog.Auth;
+using System.Diagnostics;
 
 // The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=234238
 
@@ -143,13 +144,20 @@ namespace backlog.Views
         {
             ProgRing.IsActive = true;
             EmailMessage emailMessage = new EmailMessage();
-            emailMessage.To.Add(new EmailRecipient("surya.sk05@outlook.com"));
+
+            // DEBUG
+            //emailMessage.To.Add(new EmailRecipient("surya.sk05@outlook.com"));
+            emailMessage.To.Add(new EmailRecipient("mediaexplorer74@hotmail.com"));
+
             emailMessage.Subject = "Logs from Backlogs";
             StringBuilder body = new StringBuilder();
             body.AppendLine("*Enter a brief description of your issue here*");
             body.AppendLine("\n\n\n");
             body.AppendLine("Logs:");
+
             body.AppendLine(await Logger.GetLogsAsync());
+            Debug.WriteLine("[i] Logger.GetLogsAsync...");
+            
             emailMessage.Body = body.ToString();
             await EmailManager.ShowComposeNewEmailAsync(emailMessage);
             ProgRing.IsActive = false;
@@ -158,6 +166,7 @@ namespace backlog.Views
         private async void OpenLogsButton_Click(object sender, RoutedEventArgs e)
         {
             await Logger.OpenLogFolderAsync();
+            Debug.WriteLine("[i] await Logger.OpenLogFolderAsync...");
         }
 
         private void TileToggle_Toggled(object sender, RoutedEventArgs e)
@@ -198,7 +207,10 @@ namespace backlog.Views
             EmailMessage emailMessage = new EmailMessage();
             emailMessage.Subject = "[Backlogs] " + IssueTypeComboBox.SelectedItem.ToString();
             emailMessage.Body = MessageBox.Text;
-            emailMessage.To.Add(new EmailRecipient("surya.sk05@outlook.com"));
+
+            //emailMessage.To.Add(new EmailRecipient("surya.sk05@outlook.com"));
+            emailMessage.To.Add(new EmailRecipient("mediaexplorer74@hotmail.com"));
+            
             await EmailManager.ShowComposeNewEmailAsync(emailMessage);
             ProgRing.IsActive = false;
         }

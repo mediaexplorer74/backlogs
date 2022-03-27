@@ -185,6 +185,8 @@ namespace backlog.Auth
                 try
                 {
                     await Logger.Info("Fetching graph service client.....");
+                    Debug.WriteLine("[i] Fetching graph service client.....");
+
                     var user = await graphServiceClient.Me.Request().GetAsync();
                     Settings.UserName = user.GivenName;
                     try
@@ -210,11 +212,14 @@ namespace backlog.Auth
                     catch (ServiceException ex)
                     {
                         await Logger.Error("Failed to fetch user photo", ex);
+                        Debug.WriteLine("[ex] Failed to fetch user photo: " + ex.Message);
                     }
                 }
-                catch (Exception ex)
+                catch (Exception ex2)
                 {
-                    await Logger.Error("Failed to sign-in user or get user photo and name", ex);
+                    await Logger.Error("Failed to sign-in user or get user photo and name", ex2);
+                    Debug.WriteLine("[ex] Failed to sign-in user or get user photo and name" +
+                        ex2.Message);
                 }
             }
             return graphServiceClient;
@@ -231,20 +236,26 @@ namespace backlog.Auth
             try
             {
                 await Logger.Info("Signing out user...");
+                Debug.WriteLine("[i] Signing out user...");
+
                 await PublicClientApplication.RemoveAsync(firstAccount).ConfigureAwait(false);
+                
                 Settings.IsSignedIn = false;
+                
                 try
                 {
                     await SaveData.GetInstance().DeleteLocalFileAsync();
                 }
-                catch
+                catch (Exception ex)
                 {
-                    // : )
+                    await Logger.Error("Failed to DeleteLocalFileAsync.", ex);
+                    Debug.WriteLine("[ex] Failed to DeleteLocalFileAsync: " + ex.Message);
                 }
             }
-            catch (Exception ex)
+            catch (Exception ex2)
             {
-                await Logger.Error("Failed to sign out user.", ex);
+                await Logger.Error("Failed to sign out user.", ex2);
+                Debug.WriteLine("[ex] Failed to sign out user: " + ex2.Message);
             }
         }
 

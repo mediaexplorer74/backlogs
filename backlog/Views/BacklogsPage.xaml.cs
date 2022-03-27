@@ -83,6 +83,8 @@ namespace backlog.Views
             if (isNetworkAvailable && signedIn)
             {
                 await Logger.Info("Signing in user....");
+                Debug.WriteLine("[i] Signing in user....");
+
                 graphServiceClient = await MSAL.GetGraphServiceClient();
 
                 try
@@ -99,6 +101,8 @@ namespace backlog.Views
                 if (sync)
                 {
                     await Logger.Info("Syncing backlogs....");
+                    Debug.WriteLine("[i] Syncing backlogs....");
+
                     await SaveData.GetInstance().ReadDataAsync(true);
                     PopulateBacklogs();
                 }
@@ -239,6 +243,8 @@ namespace backlog.Views
         private async Task SetUserPhotoAsync()
         {
             await Logger.Info("Setting user photo....");
+            Debug.WriteLine("[i] Setting user photo....");
+
             string userName = Settings.UserName;
             TopProfileButton.Label = userName;
             BottomProfileButton.Label = userName;
@@ -263,6 +269,7 @@ namespace backlog.Views
             catch (Exception ex)
             {
                 await Logger.Error("Error settings", ex);
+                Debug.WriteLine("[ex] Error settings Exception: " + ex.Message);
             }
         }//SetUserPhotoAsync
 

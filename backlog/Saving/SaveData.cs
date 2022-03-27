@@ -135,6 +135,7 @@ namespace backlog.Saving
             catch(FileNotFoundException ex)
             {
                 await Logging.Logger.Error("Error deleting local backlogs", ex);
+                Debug.WriteLine("[ex] Error deleting local backlogs: " + ex.Message);
             }
         }
 
