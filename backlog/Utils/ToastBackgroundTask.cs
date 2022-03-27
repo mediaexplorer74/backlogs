@@ -22,11 +22,13 @@ namespace backlog.Utils
             {
                 if(b.RemindEveryday)
                 {
+                    /*
                     var builder = new ToastContentBuilder()
                                     .AddText($"Have you checked out {b.Name} today?", hintMaxLines: 1)
                                     .AddText($"You wanted to check {b.Name} by {b.Director} out today. Here's your reminder!", hintMaxLines: 2)
                                     .AddHeroImage(new Uri(b.ImageURL));
                     builder.Show();
+                    */
                 }
             }
         }

@@ -1,4 +1,6 @@
-﻿using System;
+﻿using BackgroundTaskComponent;
+using Microsoft.QueryStringDotNET;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -19,6 +21,15 @@ using backlog.Utils;
 using System.Reflection;
 using Microsoft.Identity.Client;
 using Windows.Storage;
+using System.Threading.Tasks;
+
+using Windows.ApplicationModel.Background;
+
+using Windows.UI.Popups;
+
+using Windows.UI.Xaml.Media.Animation;
+
+
 
 namespace backlog
 {
@@ -50,8 +61,148 @@ namespace backlog
         /// will be used such as when the application is launched to open a specific file.
         /// </summary>
         /// <param name="e">Details about the launch request and process.</param>
-        protected override void OnLaunched(LaunchActivatedEventArgs e)
+        protected override async void OnLaunched(LaunchActivatedEventArgs e)
         {
+	   await OnLaunchedOrActivated(e);
+        }
+
+        /// <summary>
+        /// Invoked when the application is activated by some means other than normal launching.
+        /// </summary>
+        /// <param name="e">Event data for the event.</param>
+        protected override async void OnActivated(IActivatedEventArgs e)
+        {
+            await OnLaunchedOrActivated(e);
+        }
+
+        private async Task OnLaunchedOrActivated(IActivatedEventArgs e)
+        {
+            // Initialize things like registering background task before the app is loaded
+            await InitializeApp();
+
+#if DEBUG
+            if (System.Diagnostics.Debugger.IsAttached)
+            {
+                //this.DebugSettings.EnableFrameRateCounter = true;
+            }
+#endif
+
+            Frame rootFrame = Window.Current.Content as Frame;
+
+            // Do not repeat app initialization when the Window already has content,
+            // just ensure that the window is active
+            if (rootFrame == null)
+            {
+                // Create a Frame to act as the navigation context and navigate to the first page
+                rootFrame = new Frame();
+
+                rootFrame.NavigationFailed += OnNavigationFailed;
+
+                if (e.PreviousExecutionState == ApplicationExecutionState.Terminated)
+                {
+                    // TODO: Load state from previously suspended application
+                }
+
+                // Place the frame in the current Window
+                Window.Current.Content = rootFrame;
+            }
+
+            // Handle toast activation
+            if (e is ToastNotificationActivatedEventArgs)
+            {
+                var toastActivationArgs = e as ToastNotificationActivatedEventArgs;
+
+                // If empty args, no specific action (just launch the app)
+                if (toastActivationArgs.Argument.Length == 0)
+                {
+                    if (rootFrame.Content == null)
+                        rootFrame.Navigate(typeof(MainPage));
+                }
+
+                // Otherwise an action is provided
+                else
+                {
+                    // Parse the query string
+                    QueryString args = QueryString.Parse(toastActivationArgs.Argument);
+
+                    // See what action is being requested 
+                    switch (args["action"])
+                    {
+                        // Open the image
+                        case "viewImage":
+
+                            // The URL retrieved from the toast args
+                            string imageUrl = args["imageUrl"];
+
+                            // If we're already viewing that image, do nothing
+                            if (rootFrame.Content is ImagePage && (rootFrame.Content as ImagePage).ImageUrl.Equals(imageUrl))
+                                break;
+
+                            // Otherwise navigate to view it
+                            rootFrame.Navigate(typeof(ImagePage), imageUrl);
+                            break;
+                            
+
+                        // Open the conversation
+                        case "viewConversation":
+
+                            // The conversation ID retrieved from the toast args
+                            int conversationId = int.Parse(args["conversationId"]);
+
+                            // If we're already viewing that conversation, do nothing
+                            if (rootFrame.Content is ConversationPage && (rootFrame.Content as ConversationPage).ConversationId == conversationId)
+                                break;
+
+                            // Otherwise navigate to view it
+                            rootFrame.Navigate(typeof(ConversationPage), conversationId);
+                            break;
+
+
+                        default:
+                            throw new NotImplementedException();
+                    }
+
+                    // If we're loading the app for the first time, place the main page on the back stack
+                    // so that user can go back after they've been navigated to the specific page
+                    if (rootFrame.BackStack.Count == 0)
+                        rootFrame.BackStack.Add(new PageStackEntry(typeof(MainPage), null, null));
+                }
+            }
+
+            // Handle launch activation
+            else if (e is LaunchActivatedEventArgs)
+            {
+                var launchActivationArgs = e as LaunchActivatedEventArgs;
+
+                // If launched with arguments (not a normal primary tile/applist launch)
+                if (launchActivationArgs.Arguments.Length > 0)
+                {
+                    // TODO: Handle arguments for cases like launching from secondary Tile, so we navigate to the correct page
+                    throw new NotImplementedException();
+                }
+
+                // Otherwise if launched normally
+                else
+                {
+                    // If we're currently not on a page, navigate to the main page
+                    if (rootFrame.Content == null)
+                        rootFrame.Navigate(typeof(MainPage));
+                }
+            }
+
+            else
+            {
+                // TODO: Handle other types of activation
+                throw new NotImplementedException();
+            }
+
+
+            // Ensure the current window is active
+            Window.Current.Activate();
+        }
+
+
+/*
             Frame rootFrame = Window.Current.Content as Frame;
 
             // Do not repeat app initialization when the Window already has content,
@@ -84,7 +235,65 @@ namespace backlog
                 // Ensure the current window is active
                 Window.Current.Activate();
             }
+        }//
+*/
+
+/*
+        protected override void OnActivated(IActivatedEventArgs args)
+        {
+            InitFrame(args);
+
+            base.OnActivated(args);
         }
+*/
+
+        
+        private bool _isInitialized = false;
+        private async Task InitializeApp()
+        {
+            if (_isInitialized)
+                return;
+
+            await SaveProfilePicToAppData();
+
+            RegisterBackgroundTask();
+
+            _isInitialized = true;
+        }
+
+        private void RegisterBackgroundTask()
+        {
+            const string taskName = "ToastBackgroundTask";
+
+            // If background task is already registered, do nothing
+            if (BackgroundTaskRegistration.AllTasks.Any(i => i.Value.Name.Equals(taskName)))
+                return;
+
+            // Otherwise create the background task
+            var builder = new BackgroundTaskBuilder()
+            {
+                Name = taskName,
+                TaskEntryPoint = typeof(ToastNotificationBackgroundTask).FullName
+            };
+
+            // And set the toast action trigger
+            builder.SetTrigger(new ToastNotificationActionTrigger());
+
+            // And register the task
+            builder.Register();
+
+        }//
+
+        private async Task SaveProfilePicToAppData()
+        {
+            // Realistically, this would probably come from the internet and then get cached in the app
+            StorageFile profilePic = await StorageFile.GetFileFromApplicationUriAsync(new System.Uri("ms-appx:///Assets/Andrew.jpg"));
+
+            // And now cache their profile pic in the app
+            await profilePic.CopyAsync(ApplicationData.Current.LocalFolder, "Andrew.jpg", NameCollisionOption.ReplaceExisting);
+        }// 
+
+
 
         /// <summary>
         /// Invoked when Navigation to a certain page fails
@@ -110,14 +319,9 @@ namespace backlog
             deferral.Complete();
         }
 
-        protected override void OnActivated(IActivatedEventArgs args)
-        {
-            InitFrame(args);
-
-            base.OnActivated(args);
-        }
-
+       
         // Event fired when a Background Task is activated (in Single Process Model)
+        /*
         protected override void OnBackgroundActivated(BackgroundActivatedEventArgs args)
         {
             base.OnBackgroundActivated(args);
@@ -133,6 +337,7 @@ namespace backlog
 
             deferral.Complete();
         }
+        */
 
         /// <summary>
         /// Initialized root frame and navigates to the main page

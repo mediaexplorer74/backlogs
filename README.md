@@ -12,14 +12,6 @@ You will also get notifications to get to them on the target date.
 ## Progress
 I'm  trying to fix toast notifications, especially for Lumia phone / Win10Mobile
 
-## Screenshots
-<table><tr>
-<td> <img src="Images/shot1.png" alt="Drawing" style="width: 250px;"/> </td>
-<td> <img src="Images/shot2.png" alt="Drawing" style="width: 250px;"/> </td>
-<td> <img src="Images/shot3.png" alt="Drawing" style="width: 250px;"/> </td>
-<td> <img src="Images/shot4.png" alt="Drawing" style="width: 250px;"/> </td>
-</tr></table>
-
 ## TODO
 Notifications don't work in this (ms toasts' bugs?), I need to find another solution...
 
@@ -29,15 +21,12 @@ Form Autofill (if "+" pressed at Books section then Books type needed to autosel
 
 ## Tech req.
 Recomended os build: 19xxx or above (22xxx if Win11?)
-
 Minimal os build: 15063
-
 Platforms: x86 (PC, etc.), x64 (PC, etc.), ARM (Win10M), ARM64 (WinRT)
 
 ## About the Original
 Backlogs is a native Windows application that lets you manage your film, TV, music, 
-game and book backlogs all in one place.
- 
+game and book backlogs all in one place. 
 The app supports cross-device syncing across devices signed in with your Microsoft account.
 
 The application is available to download for Windows 10, Windows 10 Mobile, Windows 11, Xbox One and Xbox Series X.
@@ -48,12 +37,12 @@ The application is available to download for Windows 10, Windows 10 Mobile, Wind
 ### Description
 This app is built using the Universal Windows Platform framework using C# and XAML. The controls use WinUI 2. The app implements the MVVM design pattern. The backlogs created are stored in JSON format in a txt file locally and on the user's OneDrive. A Singleton is used for managing the collection of backlogs and reading/writing to the save file. OneDrive storage is implemented using Microsoft Graph.
 
-## Screenshots
+### Screenshots
 <table><tr>
-<td> <img src="backlog/Screenshots/Mobile.png" alt="Drawing" style="width: 250px;"/> </td>
-<td> <img src="backlog/Screenshots/Desktop.png" alt="Drawing" style="width: 550px;"/> </td>
-<td> <img src="backlog/Screenshots/Desktop-light.png" alt="Drawing" style="width: 550px;"/> </td>
-<td> <img src="backlog/Screenshots/Desktop-all.png" alt="Drawing" style="width: 550px;"/> </td>
+<td> <img src="Images/Mobile.png" alt="Drawing" style="width: 250px;"/> </td>
+<td> <img src="Images/Desktop.png" alt="Drawing" style="width: 550px;"/> </td>
+<td> <img src="Images/Desktop-light.png" alt="Drawing" style="width: 550px;"/> </td>
+<td> <img src="Images/Desktop-all.png" alt="Drawing" style="width: 550px;"/> </td>
 </tr></table>
 
 ### Building
@@ -71,10 +60,9 @@ This project is licensed under the GNU General Public License 3. Check LICENSE f
 
 ## Referencies
 
-https://github.com/surya-sk/backlogs  Backlogs project
+https://github.com/surya-sk/backlogs Backlogs project
 
-https://github.com/surya-sk   Surya (surya-sk nickname), UWP and Game Developer 
-
+https://github.com/surya-sk/   surya-sk (nickname), UWP and Game Developer 
 
 Best wishes,
 

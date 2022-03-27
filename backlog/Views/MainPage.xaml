@@ -93,6 +93,15 @@
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
 
+                <!-- TEMP -->
+                <Button
+                    x:Name="ButtonSendToast"
+                    Content="Click to send toast"
+                    Click="ButtonSendToast_Click"
+                    HorizontalAlignment="Stretch"
+                    Margin="0,12,0,0"
+                />
+                
                 <TextBlock x:Name="WelcomeText" Margin="30" FontSize="30" />
 
                 <RelativePanel Grid.Row="1"  Margin="10,0,0,30">
