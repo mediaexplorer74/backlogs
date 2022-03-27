@@ -29,12 +29,15 @@ Form Autofill (if "+" pressed at Books section then Books type needed to autosel
 
 ## Tech req.
 Recomended os build: 19xxx or above (22xxx if Win11?)
+
 Minimal os build: 15063
+
 Platforms: x86 (PC, etc.), x64 (PC, etc.), ARM (Win10M), ARM64 (WinRT)
 
 ## About the Original
 Backlogs is a native Windows application that lets you manage your film, TV, music, 
-game and book backlogs all in one place. 
+game and book backlogs all in one place.
+ 
 The app supports cross-device syncing across devices signed in with your Microsoft account.
 
 The application is available to download for Windows 10, Windows 10 Mobile, Windows 11, Xbox One and Xbox Series X.
@@ -68,9 +71,10 @@ This project is licensed under the GNU General Public License 3. Check LICENSE f
 
 ## Referencies
 
-https://github.com/surya-sk/backlogs Backlogs project
+https://github.com/surya-sk/backlogs  Backlogs project
 
-https://github.com/surya-sk/   surya-sk (nickname), UWP and Game Developer 
+https://github.com/surya-sk   Surya (surya-sk nickname), UWP and Game Developer 
+
 
 Best wishes,
 
