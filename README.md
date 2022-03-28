@@ -62,7 +62,8 @@ This project is licensed under the GNU General Public License 3. Check LICENSE f
 
 https://github.com/surya-sk/backlogs Backlogs project
 
-https://github.com/surya-sk/   surya-sk (nickname), UWP and Game Developer 
+https://github.com/surya-sk Surya (surya-sk nickname), UWP and Game Developer 
+
 
 Best wishes,
 

@@ -132,12 +132,12 @@
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
     <Compile Include="Auth\MSAL.cs" />
-    <Compile Include="BackButtonPage.cs" />
-    <Compile Include="ConversationPage.xaml.cs">
+    <Compile Include="Views\BackButtonPage.cs" />
+    <Compile Include="Views\ConversationPage.xaml.cs">
       <DependentUpon>ConversationPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="DefaultRedirectUri.cs" />
-    <Compile Include="ImagePage.xaml.cs">
+    <Compile Include="Views\ImagePage.xaml.cs">
       <DependentUpon>ImagePage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Logging\Logger.cs" />
@@ -242,11 +242,11 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Page Include="ConversationPage.xaml">
+    <Page Include="Views\ConversationPage.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="ImagePage.xaml">
+    <Page Include="Views\ImagePage.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

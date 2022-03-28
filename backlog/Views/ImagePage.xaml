@@ -9,7 +9,8 @@
     mc:Ignorable="d">
 
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" RequestedTheme="Dark">
-        <Image
+        <TextBlock Text="Image page (for testing deals only)"/>
+            <Image
             Source="{Binding ImageUrl, ElementName=thisPage}"
             Stretch="None"/>
     </Grid>

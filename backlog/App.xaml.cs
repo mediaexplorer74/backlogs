@@ -80,12 +80,6 @@ namespace backlog
             // Initialize things like registering background task before the app is loaded
             await InitializeApp();
 
-#if DEBUG
-            if (System.Diagnostics.Debugger.IsAttached)
-            {
-                //this.DebugSettings.EnableFrameRateCounter = true;
-            }
-#endif
 
             Frame rootFrame = Window.Current.Content as Frame;
 
@@ -115,8 +109,12 @@ namespace backlog
                 // If empty args, no specific action (just launch the app)
                 if (toastActivationArgs.Argument.Length == 0)
                 {
-                    if (rootFrame.Content == null)
-                        rootFrame.Navigate(typeof(MainPage));
+                    // DEBUG
+                    if (1==1)//(rootFrame.Content == null)
+                    {
+                        //rootFrame.Navigate(typeof(MainPage));
+                        rootFrame.Navigate(typeof(ImagePage));
+                    }
                 }
 
                 // Otherwise an action is provided
@@ -159,7 +157,10 @@ namespace backlog
 
 
                         default:
-                            throw new NotImplementedException();
+                            //throw new NotImplementedException();
+                            // Otherwise navigate to view it
+                            rootFrame.Navigate(typeof(ImagePage));
+                            break;
                     }
 
                     // If we're loading the app for the first time, place the main page on the back stack
