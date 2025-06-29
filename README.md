@@ -1,5 +1,4 @@
-<img src="backlog/Assets/app-icon.png" width="100" height="100" />
-<h2>Backlogs</h2>
+# Backlogs 0.9.2.0-alpha - dev branch
 This is the fork of https://github.com/surya-sk/backlogs (Backlogs 0.9.2, dev branch)
 
 ## Description
@@ -9,8 +8,8 @@ Backlogs is a simple Universal Windows Platform app that lets you manage all you
 Your backlogs are synced with all devices signed-in with your Microsoft account (if you sign-in). 
 You will also get notifications to get to them on the target date.
 
-## Progress
-I'm  trying to fix toast notifications, especially for Lumia phone / Win10Mobile
+## Status
+After 3 years, I'm still trying to resarh toast notifications, especially for Lumia phone / Win10Mobile. I need to RnD last (newsest) version of Backlogs project (to be continued) 
 
 ## TODO
 Notifications don't work in this (ms toasts' bugs?), I need to find another solution...
@@ -67,5 +66,5 @@ https://github.com/surya-sk Surya (surya-sk nickname), UWP and Game Developer
 
 Best wishes,
 
-[m][e] 2022
+[m][e] 2022-2025
 
