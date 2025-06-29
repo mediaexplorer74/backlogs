@@ -1,4 +1,7 @@
 # Backlogs 0.9.2.0-alpha - dev branch
+
+![](/Images/logo.png)
+
 This is the fork of https://github.com/surya-sk/backlogs (Backlogs 0.9.2, dev branch)
 
 ## Description
@@ -7,6 +10,10 @@ albums you want to listen to and games you want to play, all in one place.
 Backlogs is a simple Universal Windows Platform app that lets you manage all your backlogs in one place. 
 Your backlogs are synced with all devices signed-in with your Microsoft account (if you sign-in). 
 You will also get notifications to get to them on the target date.
+
+## Screenshots
+![](/Images/sshot01.png)
+![](/Images/sshot02.png)
 
 ## Status
 After 3 years, I'm still trying to resarh toast notifications, especially for Lumia phone / Win10Mobile. I need to RnD last (newsest) version of Backlogs project (to be continued) 

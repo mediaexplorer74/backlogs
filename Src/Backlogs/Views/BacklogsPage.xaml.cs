@@ -1,0 +1,453 @@
+﻿using Backlogs.Auth;
+using Backlogs.Logging;
+using Backlogs.Models;
+using Backlogs.Saving;
+using Backlogs.Utils;
+using Microsoft.Graph;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Net.NetworkInformation;
+using System.Runtime.InteropServices.WindowsRuntime;
+using System.Threading.Tasks;
+using Windows.Foundation;
+using Windows.Foundation.Collections;
+using Windows.Storage;
+using Windows.Storage.Streams;
+using Windows.UI.Core;
+using Windows.UI.Xaml;
+using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Controls.Primitives;
+using Windows.UI.Xaml.Data;
+using Windows.UI.Xaml.Input;
+using Windows.UI.Xaml.Media;
+using Windows.UI.Xaml.Media.Animation;
+using Windows.UI.Xaml.Media.Imaging;
+using Windows.UI.Xaml.Navigation;
+
+// The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=234238
+
+namespace Backlogs.Views
+{
+    /// <summary>
+    /// An empty page that can be used on its own or navigated to within a Frame.
+    /// </summary>
+    public sealed partial class BacklogsPage : Page
+    {
+        private ObservableCollection<Backlog> allBacklogs { get; set; }
+        private ObservableCollection<Backlog> backlogs { get; set; }
+        private ObservableCollection<Backlog> filmBacklogs { get; set; }
+        private ObservableCollection<Backlog> tvBacklogs { get; set; }
+        private ObservableCollection<Backlog> gameBacklogs { get; set; }
+        private ObservableCollection<Backlog> musicBacklogs { get; set; }
+        private ObservableCollection<Backlog> bookBacklogs { get; set; }
+        GraphServiceClient graphServiceClient;
+
+        bool isNetworkAvailable = false;
+        bool signedIn;
+        int backlogIndex = -1;
+        bool sync = false;
+
+        // BacklogsPage
+        public BacklogsPage()
+        {
+            this.InitializeComponent();
+            isNetworkAvailable = NetworkInterface.GetIsNetworkAvailable();
+            Task.Run(async () => { await SaveData.GetInstance().ReadDataAsync(); }).Wait();
+            InitBacklogs();
+
+        }//BacklogsPage
+
+
+        // OnNavigatedTo
+        protected async override void OnNavigatedTo(NavigationEventArgs e)
+        {
+            base.OnNavigatedTo(e);
+            if (e.Parameter != null && e.Parameter.ToString() != "")
+            {
+                if (e.Parameter.ToString() == "sync")
+                {
+                    sync = true;
+                }
+                else
+                {
+                    // for backward connected animation
+                    backlogIndex = int.Parse(e.Parameter.ToString());
+                }
+            }
+            ProgBar.Visibility = Visibility.Visible;
+            signedIn = Settings.IsSignedIn;
+            if (isNetworkAvailable && signedIn)
+            {
+                await Logger.Info("Signing in user....");
+                Debug.WriteLine("[i] Signing in user....");
+
+                graphServiceClient = await MSAL.GetGraphServiceClient();
+
+                try
+                {
+                    await SetUserPhotoAsync();
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine("[ex] Exception: " + ex.Message);
+                }
+
+                TopProfileButton.Visibility = Visibility.Visible;
+                BottomProfileButton.Visibility = Visibility.Visible;
+                if (sync)
+                {
+                    await Logger.Info("Syncing backlogs....");
+                    Debug.WriteLine("[i] Syncing backlogs....");
+
+                    await SaveData.GetInstance().ReadDataAsync(true);
+                    PopulateBacklogs();
+                }
+            }
+            ProgBar.Visibility = Visibility.Collapsed;
+
+        }//OnNavigatedTo
+
+
+        /// <summary>
+        /// Initalize backlogs
+        /// </summary>
+
+        // InitBacklogs
+        private void InitBacklogs()
+        {
+            allBacklogs = SaveData.GetInstance().GetBacklogs();
+            var readBacklogs = new ObservableCollection<Backlog>(allBacklogs.Where(b => b.IsComplete == false));
+            backlogs = new ObservableCollection<Backlog>(readBacklogs.OrderBy(b => b.CreatedDate));
+            filmBacklogs = new ObservableCollection<Backlog>(backlogs.Where(b => b.Type == BacklogType.Film.ToString()));
+            tvBacklogs = new ObservableCollection<Backlog>(backlogs.Where(b => b.Type == BacklogType.TV.ToString()));
+            gameBacklogs = new ObservableCollection<Backlog>(backlogs.Where(b => b.Type == BacklogType.Game.ToString()));
+            musicBacklogs = new ObservableCollection<Backlog>(backlogs.Where(b => b.Type == BacklogType.Album.ToString()));
+            bookBacklogs = new ObservableCollection<Backlog>(backlogs.Where(b => b.Type == BacklogType.Book.ToString()));
+            ShowEmptyMessage();
+            var view = SystemNavigationManager.GetForCurrentView();
+            view.AppViewBackButtonVisibility = AppViewBackButtonVisibility.Visible;
+            view.BackRequested += View_BackRequested;
+
+        }//InitBacklogs
+
+        private void View_BackRequested(object sender, BackRequestedEventArgs e)
+        {
+            try
+            {
+                Frame.Navigate(typeof(MainPage), null, new SlideNavigationTransitionInfo() { Effect = SlideNavigationTransitionEffect.FromLeft });
+            }
+            catch
+            {
+                Frame.Navigate(typeof(MainPage));
+            }
+            e.Handled = true;
+
+        }//View_BackRequested
+
+        /// <summary>
+        /// Populate the backlogs list with up-to-date backlogs
+        /// </summary>
+        /// 
+        // PopulateBacklogs
+        private void PopulateBacklogs()
+        {
+            var readBacklogs = SaveData.GetInstance().GetBacklogs().Where(b => b.IsComplete == false);
+            var _backlogs = new ObservableCollection<Backlog>(readBacklogs.OrderBy(b => b.CreatedDate)); // sort by last created
+            var _filmBacklogs = new ObservableCollection<Backlog>(_backlogs.Where(b => b.Type == BacklogType.Film.ToString()));
+            var _tvBacklogs = new ObservableCollection<Backlog>(_backlogs.Where(b => b.Type == BacklogType.TV.ToString()));
+            var _gameBacklogs = new ObservableCollection<Backlog>(_backlogs.Where(b => b.Type == BacklogType.Game.ToString()));
+            var _musicBacklogs = new ObservableCollection<Backlog>(_backlogs.Where(b => b.Type == BacklogType.Album.ToString()));
+            var _bookBacklogs = new ObservableCollection<Backlog>(_backlogs.Where(b => b.Type == BacklogType.Book.ToString()));
+            backlogs.Clear();
+            filmBacklogs.Clear();
+            tvBacklogs.Clear();
+            gameBacklogs.Clear();
+            musicBacklogs.Clear();
+            bookBacklogs.Clear();
+            EmptyListText.Visibility = Visibility.Collapsed;
+            foreach (var b in _backlogs)
+            {
+                backlogs.Add(b);
+            }
+            foreach (var b in _bookBacklogs)
+            {
+                bookBacklogs.Add(b);
+            }
+            foreach (var b in _filmBacklogs)
+            {
+                filmBacklogs.Add(b);
+            }
+            foreach (var b in _gameBacklogs)
+            {
+                gameBacklogs.Add(b);
+            }
+            foreach (var b in _tvBacklogs)
+            {
+                tvBacklogs.Add(b);
+            }
+            foreach (var b in _musicBacklogs)
+            {
+                musicBacklogs.Add(b);
+            }
+            ShowEmptyMessage();
+
+        }//PopulateBacklogs
+
+
+        // ShowEmptyMessage
+        private void ShowEmptyMessage()
+        {
+            ObservableCollection<Backlog>[] _backlogs = 
+            { 
+                backlogs, 
+                filmBacklogs, 
+                tvBacklogs, 
+                gameBacklogs, 
+                musicBacklogs, 
+                bookBacklogs 
+            };
+            TextBlock[] textBlocks = 
+            { 
+                EmptyListText, 
+                EmptyFilmsText, 
+                EmptyTVText, 
+                EmptyGamesText, 
+                EmptyMusicText, 
+                EmptyBooksText 
+            };
+            for (int i = 0; i < _backlogs.Length; i++)
+            {
+                if (_backlogs[i].Count <= 0)
+                {
+                    textBlocks[i].Visibility = Visibility.Visible;
+                    if (i > 0)
+                    {
+                        textBlocks[i].Text = $"Nothing to see here. Add some!";
+                    }
+                }
+                else
+                {
+                    textBlocks[i].Visibility = Visibility.Collapsed;
+                }
+            }
+        }//ShowEmptyMessage
+
+        /// <summary>
+        /// Set the user photo in the command bar
+        /// </summary>
+        /// <returns></returns>
+        private async Task SetUserPhotoAsync()
+        {
+            await Logger.Info("Setting user photo....");
+            Debug.WriteLine("[i] Setting user photo....");
+
+            string userName = Settings.UserName;
+            TopProfileButton.Label = userName;
+            BottomProfileButton.Label = userName;
+            var cacheFolder = ApplicationData.Current.LocalCacheFolder;
+            try
+            {
+                var accountPicFile = await cacheFolder.GetFileAsync("profile.png");
+                
+                using 
+                    (
+                        IRandomAccessStream stream = 
+                        await accountPicFile.OpenAsync(FileAccessMode.Read)
+                    )
+                {
+                    BitmapImage image = new BitmapImage();
+                    stream.Seek(0);
+                    await image.SetSourceAsync(stream);
+                    TopAccountPic.ProfilePicture = image;
+                    BottomAccountPic.ProfilePicture = image;
+                }
+            }
+            catch (Exception ex)
+            {
+                await Logger.Error("Error settings", ex);
+                Debug.WriteLine("[ex] Error settings Exception: " + ex.Message);
+            }
+        }//SetUserPhotoAsync
+
+
+        /// <summary>
+        /// Opens the Backlog details page
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void BacklogView_ItemClick(object sender, ItemClickEventArgs e)
+        {
+            var selectedBacklog = (Backlog)e.ClickedItem;
+            PivotItem pivotItem = (PivotItem)mainPivot.SelectedItem;
+            // Prepare connected animation based on which section the user is on
+            switch (pivotItem.Header.ToString())
+            {
+                default:
+                    BacklogsGrid.PrepareConnectedAnimation
+                        ("cover", selectedBacklog, "coverImage");
+                    break;
+                case "films":
+                    FilmsGrid.PrepareConnectedAnimation
+                        ("cover", selectedBacklog, "coverImage");
+                    break;
+                case "tv":
+                    TVGrid.PrepareConnectedAnimation
+                        ("cover", selectedBacklog, "coverImage");
+                    break;
+                case "books":
+                    BooksGrid.PrepareConnectedAnimation
+                        ("cover", selectedBacklog, "coverImage");
+                    break;
+                case "games":
+                    GamesGrid.PrepareConnectedAnimation
+                        ("cover", selectedBacklog, "coverImage");
+                    break;
+                case "albums":
+                    AlbumsGrid.PrepareConnectedAnimation
+                        ("cover", selectedBacklog, "coverImage");
+                    break;
+            }
+            Frame.Navigate
+                (
+                typeof(BacklogPage), 
+                selectedBacklog.id, 
+                new SuppressNavigationTransitionInfo()
+                );
+        }
+
+        /// <summary>
+        /// Opens the Create page
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void CreateButton_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                Frame.Navigate(typeof(CreatePage), null, new SlideNavigationTransitionInfo() { Effect = SlideNavigationTransitionEffect.FromBottom });
+            }
+            catch
+            {
+                Frame.Navigate(typeof(CreatePage));
+            }
+        }// CreateButton_Click
+
+        /// <summary>
+        /// Opens the Setting page
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void SettingsButton_Click(object sender, RoutedEventArgs e)
+        {
+            Frame.Navigate(typeof(SettingsPage));
+        }// SettingsButton_Click
+
+
+
+        /// <summary>
+        /// Sync backlogs
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void SyncButton_Click(object sender, RoutedEventArgs e)
+        {
+            Frame.Navigate(typeof(BacklogsPage), "sync");
+
+        }//SyncButton_Click
+
+
+        // CompletedBacklogsButton_Click
+        private void CompletedBacklogsButton_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                Frame.Navigate(typeof(CompletedBacklogsPage), null, new SlideNavigationTransitionInfo() { Effect = SlideNavigationTransitionEffect.FromRight });
+            }
+            catch
+            {
+                Frame.Navigate(typeof(CompletedBacklogsPage));
+            }
+        }//CompletedBacklogsButton_Click
+
+
+
+        /// <summary>
+        /// Finish connected animation
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        /// 
+        // BacklogsGrid_Loaded
+        private async void BacklogsGrid_Loaded(object sender, RoutedEventArgs e)
+        {
+            if (backlogIndex != -1)
+            {
+                ConnectedAnimation animation = 
+                    ConnectedAnimationService.GetForCurrentView().GetAnimation("backAnimation");
+                try
+                {
+                    await BacklogsGrid.TryStartConnectedAnimationAsync
+                        (
+                            animation, 
+                            allBacklogs[backlogIndex], 
+                            "coverImage"
+                        );
+                }
+                catch
+                {
+                    // : )
+                }
+            }
+
+        }//BacklogsGrid_Loaded
+
+
+        // SearchButton_Click
+        private async void SearchButton_Click(object sender, RoutedEventArgs e)
+        {
+            await SearchDialog.ShowAsync();
+        }//SearchButton_Click
+
+
+        // SearchBox_TextChanged
+        private void SearchBox_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
+        {
+            if (args.Reason == AutoSuggestionBoxTextChangeReason.UserInput)
+            {
+                List<string> suggestions = new List<string>();
+                var splitText = sender.Text.ToLower().Split(' ');
+                foreach (var backlog in backlogs)
+                {
+                    var found = splitText.All((key) =>
+                    {
+                        return backlog.Name.ToLower().Contains(key);
+                    });
+                    if (found)
+                    {
+                        suggestions.Add(backlog.Name);
+                    }
+                }
+                if (suggestions.Count == 0)
+                {
+                    suggestions.Add("No results found");
+                }
+                sender.ItemsSource = suggestions;
+
+            }
+        }//SearchBox_TextChanged
+
+
+        // SearchBox_QuerySubmitted
+        private void SearchBox_QuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
+        {
+            var selectedBacklog = backlogs.FirstOrDefault(b => b.Name == args.ChosenSuggestion.ToString());
+            SearchDialog.Hide();
+            Frame.Navigate(typeof(BacklogPage), selectedBacklog.id, null);
+
+        }//SearchBox_QuerySubmitted
+    }
+}

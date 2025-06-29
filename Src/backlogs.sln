@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.2.32317.152
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "backlog", "backlog\backlog.csproj", "{147688A8-D934-41C9-8620-D0A9B392856C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Backlogs", "Backlogs\Backlogs.csproj", "{147688A8-D934-41C9-8620-D0A9B392856C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BackgroundTaskComponent", "BackgroundTaskComponent\BackgroundTaskComponent.csproj", "{D16B316B-596A-4D9C-BF4A-05E08D433855}"
 EndProject
