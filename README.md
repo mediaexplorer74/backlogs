@@ -26,7 +26,7 @@ You will also get notifications to get to them on the target date.
 - Platforms: x86 (PC, etc.), x64 (PC, etc.), ARM (Win10M), ARM64 (WinRT)
 
 ## TODO
-- Research to last (newest) version of Backlogs project 
+- Research to Surya's newest version of Backlogs project 
 
 ## Referencies
 - https://github.com/surya-sk/backlogs Backlogs project
