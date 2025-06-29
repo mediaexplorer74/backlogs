@@ -17,7 +17,7 @@ You will also get notifications to get to them on the target date.
 ![](/Images/sshot03.png)
 
 ## Status
-- After 3 years, I'm still trying to resarh toast notifications, especially for Lumia phone / Win10Mobile. I need to RnD last (newest) version of Backlogs project 
+- After 3 years, I'm still trying to research toast notifications, especially for Lumia phone / Win10Mobile. I need to RnD last (newest) version of Backlogs project 
 - I noticed than 1 notification appeared ! :)
 
 ## TODO
