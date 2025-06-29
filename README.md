@@ -73,5 +73,7 @@ https://github.com/surya-sk Surya (surya-sk nickname), UWP and Game Developer
 
 Best wishes,
 
-[m][e] 2022-2025
+[M][E] June, 29 2025
+
+![](/Images/footer.png)
 
